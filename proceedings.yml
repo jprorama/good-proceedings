@@ -1,0 +1,24 @@
+version: 1
+project:
+  open_access: true
+  license: CC-BY-4.0
+  venue:
+    title: Global Open OnDemand Conference
+    short_title: GOOD
+    number: 1st
+    location: Harvard University
+    date: March 17 - March 20, 2025
+    publisher: Global Open OnDemand Community
+    series: Proceedings of the Global Open OnDemand Conference
+    # issn:
+    # doi:
+    url: https://www.conference2025.openondemand.org/
+  date: 2025-05-31
+  # volume:
+  #   title: Proceedings of the 1st Global Open OnDemand Conference
+  #   subject: The Future of Open OnDemand
+  #   doi:
+  # editors:
+  #   - name:
+  #     email:
+  #     affiliation:

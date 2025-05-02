@@ -1,0 +1,22 @@
+name: Submit paper
+on:
+  pull_request_target:
+    branches: ['2025']
+    types: [labeled, opened, synchronize, reopened]
+permissions:
+  contents: read
+  pull-requests: write
+jobs:
+  submit:
+    uses: curvenote/actions/.github/workflows/submit.yml@v1
+    with:
+      id-pattern-regex: '^good-2025-(?:[a-zA-Z0-9-_]{2,15})$'
+      enforce-single-folder: true
+      venue: good
+      collection: '2025'
+      kind: article
+      path: papers/*
+      label: approved
+    secrets:
+      CURVENOTE: ${{ secrets.CURVENOTE_TOKEN }}
+      GITHUB: ${{ secrets.GITHUB_TOKEN }}

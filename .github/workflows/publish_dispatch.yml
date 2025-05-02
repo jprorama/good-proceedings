@@ -1,0 +1,17 @@
+name: Publish all 2025 articles
+on: workflow_dispatch
+permissions:
+  contents: write
+jobs:
+  publish:
+    uses: curvenote/actions/.github/workflows/submit.yml@v1
+    with:
+      id-pattern-regex: '^good-2025-(?:[a-zA-Z0-9-_]{2,25})$'
+      venue: good
+      collection: '2025'
+      kind: article
+      path: papers/*
+      publish: true
+    secrets:
+      CURVENOTE: ${{ secrets.CURVENOTE_TOKEN }}
+      GITHUB: ${{ secrets.GITHUB_TOKEN }}
