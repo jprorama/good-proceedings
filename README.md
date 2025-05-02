@@ -9,8 +9,8 @@ All authors, commenters, and editors are expected to show respect and courtesy t
 ## Instructions for authors
 
 - Fork this repository
-- Create a folder in the `papers` folder (if you are submitting a full paper) or the `presentations` folder (if you are only submitting slides or a poster)
-- Add your content to your folder, following the `examples`. For papers, [MyST markdown](https://mystmd.org/) will give you the most control of how your paper renders in the web. However, docx papers are also accepted. For posters and slides, any file format is accepted.
+- Create a folder in the `papers` folder (if you are submitting a full paper) or the `slides`/`posters` folder (if you are only submitting slides or a poster)
+- Add your content to your folder, following the `examples`. For papers, [MyST markdown](https://mystmd.org/) will give you the most control of how your paper renders in the web. However, docx papers are also accepted. For posters and slides, PDF is preferred, but any file format is accepted.
 - Whether you are submitting MyST, docx, slides, or a poster, ensure you have a `myst.yml` file with all relevant metadata.
 - Commit the contents of your folder and create a pull request to the `2025` branch of this repository.
 - You or one of the editors will add a `draft` label; this will initiate automated checks and a preview build of your paper. Review this final build and ensure the checks pass.
