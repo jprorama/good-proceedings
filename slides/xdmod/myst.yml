@@ -1,0 +1,14 @@
+version: 1
+extends: ../slides.yml
+project:
+  title: Integrating XDMoD & Open OnDemand
+  authors:
+    - name: Dori Sajdak
+      affiliation: University at Buffalo - Center for Computational Research
+      orcid: 0000-0003-4174-5423
+  abstract: |
+    XDMoD is a comprehensive framework for cyberinfrastructure system management. The detailed metrics available from XDMoD 
+    allow you to better understand your HPC jobs, storage, networking, and OnDemand usage.  This tutorial steps through the 
+    two integrations between Open OnDemand and Open XDMoD.  You'll learn how to configure and display job performance graphs 
+    from XDMoD on the OnDemand dashboard.  Then you'll learn how to configure XDMoD to pull in OnDemand web logs, allowing
+    you to gain insight into how your users are utilizing OnDemand.
