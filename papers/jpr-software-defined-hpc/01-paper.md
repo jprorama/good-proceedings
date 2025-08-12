@@ -19,11 +19,6 @@ abstract: |
   a motivating use case for this infrastucture used to prove the utility
   of this infrastructure.  Finally, we conclude with observations on functionality 
   provided by the infrastructure and highlight emerging directions for this work.
-license: CC-BY-4.0
-exports:
-  - format: pdf
-    templates: volcanica
-    article_type: Report
 ---
 
 

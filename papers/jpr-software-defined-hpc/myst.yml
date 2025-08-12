@@ -1,7 +1,8 @@
 # See docs at: https://mystmd.org/guide/frontmatter
 version: 1
+extends: ../papers.yml
 project:
-  id: 5b16e152-5730-4acd-8343-92927e2e956c
+  id: good-2025-jpr-software-defined-hpc
   # title:
   # description:
   # keywords: []
