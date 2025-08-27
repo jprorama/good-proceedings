@@ -1,0 +1,15 @@
+version: 1
+extends: ../slides.yml
+project:
+  title: Approachable High Performance Computing at Michigan State University
+    - name: Joseph Peter Hrul Ryan
+      affiliation: Michigan State University
+      orcid: 0009-0001-0901-9600
+  abstract: |
+    Administrators and Research Consultants helping researchers scale their work 
+    can use Open OnDemand applications to make HPC resources more accessible to 
+    disciplines that are not traditionally identified as HPC users.  A brief 
+    discussion of how we help make high performance computing (HPC) more 
+    approachable to new users, with an emphasis on the applications presented, 
+    support process, and using Open OnDemand as a launch pad to fully integrate 
+    new users into the HPC workflow.
