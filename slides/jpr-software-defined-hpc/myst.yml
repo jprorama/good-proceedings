@@ -1,0 +1,21 @@
+version: 1
+extends: ../slides.yml
+project:
+  title: Software Defined HPC with Open OnDemand
+  authors:
+    - name: John-Paul Robinson
+      affiliation: uab
+    - name: Louis Chen
+      affiliation: uab
+    - name: Eesaan Atluri
+      affiliation: uab
+    - name: Krish Moodbidri
+      affiliation: uab
+  affiliations:
+    - id: uab
+      name: The University of Alabama at Birmingham
+      department: Research Computing Development Team
+  abstract: |
+    Slides presented at GOOD 2025 conference on March 19, 2024 describing
+    the use of Open OnDemand as part of a software defined infrastructure
+    to access campus HPC resources.
