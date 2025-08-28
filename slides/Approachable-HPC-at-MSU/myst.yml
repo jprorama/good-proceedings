@@ -2,6 +2,7 @@ version: 1
 extends: ../slides.yml
 project:
   title: Approachable High Performance Computing at Michigan State University
+  authors:
     - name: Joseph Peter Hrul Ryan
       affiliation: Michigan State University
       orcid: 0009-0001-0901-9600
