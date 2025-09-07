@@ -11,14 +11,13 @@ authors:
   - name: Krish Moodbidri
 abstract: |
   We introduce a software defined infrastructure for high performance 
-  computing (HPC) that uses
-  application proxies to route SSH and web connections to appropriate endpoints based
-  on user identity. We detail the construction of the CICD pipelines used 
-  to builds and deploys Open OnDemand and the application proxies to facilite
-  developement and maintenance operations.  We document
-  a motivating use case for this infrastucture used to prove the utility
-  of this infrastructure.  Finally, we conclude with observations on functionality 
-  provided by the infrastructure and highlight emerging directions for this work.
+  computing (SDHPC) that includes
+  SSH and web application routers for user-based connection routing to endpoints based on individual user identities. We detail Continuous Integration
+  and Continuous Deployment (CICD) pipelines used
+  to build and deploy an infrastructure of application proxies that route users to appropriate login and Open OnDemand nodes based on their group membership.
+  We demonstrate the utility of this infrastructure to our motivating use case of
+  limiting user downtime during maintenance operations.
+  We conclude with observations on functionality and highlight future directions.
 ---
 
 
