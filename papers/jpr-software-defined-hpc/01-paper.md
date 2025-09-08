@@ -7,8 +7,14 @@ authors:
     orcid: 0009-0007-4063-2599
     email: jpr@uab.edu
   - name: Louis Chen
+    affiliations:
+      - University of Alabama at Birmingham, Research Computing
   - name: Eesaan Atluri
+    affiliations:
+      - University of Alabama at Birmingham, Research Computing
   - name: Krish Moodbidri
+    affiliations:
+      - University of Alabama at Birmingham, Research Computing
 abstract: |
   We introduce a software defined infrastructure for high performance 
   computing (SDHPC) that includes
@@ -18,6 +24,13 @@ abstract: |
   We demonstrate the utility of this infrastructure to our motivating use case of
   limiting user downtime during maintenance operations.
   We conclude with observations on functionality and highlight future directions.
+
+keywords:
+  - High Performance Computing
+  - Sofrware Defined
+  - Infrastructure as Code
+  - CICD
+  - Cloud
 ---
 
 
