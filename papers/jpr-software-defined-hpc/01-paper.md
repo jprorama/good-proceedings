@@ -1,5 +1,8 @@
 ---
 title: Software Defined HPC with Open OnDemand
+exports:
+  - format: pdf
+    template: arxiv_two_column
 authors:
   - name: John-Paul Robinson
     affiliations:
