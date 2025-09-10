@@ -66,7 +66,7 @@ Operating cloud-native infrastructure at-scale is improved with development proc
 To that end, we created a CICD workflow to build and deploy our application routing front-end nodes and the Open On Demand web services.
 This workflow ensures that we can deliver features and fix bugs through regular deployments of this software-defined infrastructure.
 
-In the next section we hightlight trends in the design of large-scale systems in industry and research that are driving evolution of HPC to cloud-native infrastructure.
+In the next section we hightlight trends in the design of large-scale systems in industry and research that are driving evolution toward cloud-native HPC infrastructure.
 In section [sec-tag] we document the design of our software-defined infrastructure to route user connections to desired endpoints and the CICD workflow used to deploy it.
 In section [sec-tag] we discuss the initial use-case for this infrastructure and assess its utility.
 We conclude the paper with a discussion of future directions.
@@ -83,15 +83,82 @@ maybe ssh.piper
 cri_xcbc?
 
 -->
-Research Computing System
 
-OpenStack for on-site cloud-native infrastructure
+OpenStack for on-site cloud-native infrastructure.
+- it is a software defined data center infrastructure
+- advanced software defined infrastructure across compute, storage, and network
+- in a typical deploy, it overlays SDN capabilities across an L2 fabric and bridges the internal SDN stack with traditional site networks.
+- advanced deploys can integrate the SDN stack provided by neutron and ovn to control physical devices via openVSwitch and controller devices? can't recall words
+- supports L3 to the host
 
 Jetstream2 for at-scale cloud operations
+- advanced OpenStack cloud available through NFS access.
+- demonstrates at-scale operations and provides direct access to advanced hardware through access allocations
+
+CRI_XCBC
+- legacy software fabric of the XSEDE project as an early working deployement of a full HPC stack using Ansible
+- provides our foundation for working with cluster environments
 
 
+Datacenter as the computer
 
-# CICD Solution
+
+# Software Defined HPC
+
+HPC clusters have long aligned with the principles of software defined infrastucture.
+The original Beowulf cluster design deployed fleets of identical compute nodes under the control of a head node that also supplied the core infrastructure for HPC operations.
+Today's infrastructure leverages these same approaches to provide scalable compute, storage, and network capacty.
+
+
+## Research Computing System
+
+Buidlding a cloud native experience.
+In order to align campus research computing infrasture with scalable, cloud-native solutions, we adpopted the data-center-as-the-computer model to create a coherent infrastructure that deliver compute, storage, and networking for research applications.
+We identify this platform as the Research Computing System (RCS), see Fig XXX.
+RCS supports HPC batch, virtual machine cloud, and process container compute modelities.
+The compute services integrate with storage systems that provide high speed parallel file systems, block devices, and object storage.
+Compute and storage are integrated with a network fabric the provides bandwidth for both east-west and north-south traffic flows.
+The RCS interfaces with external networks peering to both campus and R&E network via a Science DMZ segment.
+
+HPC batch computing is built upon a traditional stand-alone compute cluster implemented with Bright Cluster Manager and connected to a GPFS parallel file system.
+The evolution to the RCS design, now positions this infrastructure along-side the VM and container platforms.
+The VM cloud compute capacity is built upon OpenStack which provide comprehensive software defined infrastructure.
+This infrastructure is leveraged to build and operate the application routers, Open OnDemand web service, and CICD workflows describe the in following subsections.
+Container compute capacity for RCS is provided by Kubernetes.
+The current work is not implemented with microservices so this subsystem is not discussed further.
+
+In addition to GPFS parallel storage for HPC workloads, RCS leverages Ceph storage subsystems to deliver block and object storage services to OpenStack and Kubernetes based workloads.
+Ceph additionally provides public S3 endpoints for user data and Cephfs as a tiering backend for GPFS.
+The Science DMZ leverages Globus as the I/O interface for moving data to GPFS and allows users to manage other storage systems via additional Globus connectors.
+The campus peering connection provides network access to all other services in the RCS.
+Enhancements to the RCS network interface are under consideration for future services.
+
+## Application Routers
+
+This is the proxy interfacing and tooling developed.
+
+so we can actually say we have the openstack as a front end to our hpc
+the advantage here is that we can use this same front end regardless of where a physical cluster may actually be located
+openstack gives us cloud-native tooling and sdn to route traffic to desired destinations
+
+## CICD Pipelines
+
+Ansible legacy of cri_xcbc
+- note that we now have externalized our cluster deployment to match our production cluster software Bright Cluster Manager
+- the framework still provides the core of our node abstractions for the components in our evironment, specically adding the OOD
+- we started off OOD dev by adding it to cri_xcbc as an integrated part of the pipeline
+- the app routers are built directly in gitlab ci as artificts contstructed directly on the openstack cloud infrastructure
+- show construction of cicd pipelines and how the produce their artifacts
+
+This is how it's deployed
+
+OOD's success stems not from displacing the traditional command shell but by enhancing the user experience to include web-native applications that sit naturally along-side their traditional cluster interaction.
+A basic deployment provides access to Juptyer notebooks, R-Studio, and a browser-based VNC desktop capable of presenting any traditional GUI applicaiton, like Matlab or QGIS, within the browser.
+All of these web-based applications are easily launched as jobs on cluster compute nodes through simple button clicks in the web browser.
+
+The key aspect of the OOD architecture is transparent mapping of browser actions to per-user web servers that run applications under the native cluster identity of the user.
+This allows all actions performed by the user on the cluster, whether via the web or the command shell, to run in the context of their Kaccount and ahere to a consistent security model enforced by the operating system across the cluster.
+User's can only access cluster resources as dictated by their account permissions.
 
 <!---  this is the interface for modern hpc + globus, we do not address globus routing in this work. -->
 for our ssh proxy we use ssh-piper
@@ -157,6 +224,12 @@ with the automated build and deploy of our CICD pipelines, we ensure we can reli
 # Experimental setup
 
 this is the experiment
+this doesn't need to cover how the data is moved
+that's really opaque to the deployment
+we can just say we can place accounts on hold, do final sync, and route the user to their new space
+conclusion can mention the complexity of the data movement as separate work
+this does acheive our ability to fluidly move people and projects
+conclusion can note the side effect is more autonomy of science engagement which is helping drive our goal for end-user managed infrastructure.
 
 our motivation for this infrastucture is to facilitate the forward migration of our user community as our infrastructure evoles and adapts to emerging requirements.
 our rcs has subsystems that provide rich abstractions over infrastruture out of the box
