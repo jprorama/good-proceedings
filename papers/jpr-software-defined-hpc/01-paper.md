@@ -45,14 +45,14 @@ Users SSH to a cluster login node from where the user submits batch jobs to a sc
 Many attempts have been to enhanced the user experience with web-based tooling to reduce learning curves and create a more immersive browser-based user experience.
 In this space, Open OnDemand has emerged as the most successful web integration for HPC.
 Over the past decade, Open OnDemnd (OOD) has come to dominate the HPC landscape as the de facto web experience and can now be seen as a fundamental component of any HPC cluster.
-OOD has elevated HPC to a web-native application and shaped expectations to align with the self-directed experiences of the cloud.
+OOD has elevated HPC to a web-native experience and shaped user expectation for HPC to align with the self-directed experiences of cloud-native applications.
 
 OOD's success stems not from displacing the traditional command shell but by enhancing the user experience to include web-native applications that sit naturally along-side their traditional cluster interaction.
 A basic deployment provides access to Juptyer notebooks, R-Studio, and a browser-based VNC desktop capable of presenting any traditional GUI applicaiton, like Matlab or QGIS, within the browser.
 All of these web-based applications are easily launched as jobs on cluster compute nodes through simple button clicks in the web browser.
 
 The key aspect of the OOD architecture is transparent mapping of browser actions to per-user web servers that run applications under the native cluster identity of the user.
-This allows all actions performed by the user on the cluster, whether via the web or the command shell, to run in the context of their account and ahere to a consistent security model enforced by the operating system across the cluster.
+This allows all actions performed by the user on the cluster, whether via the web or the command shell, to run in the context of their account and adhere to a consistent security model enforced by the operating system across the cluster.
 User's can only access cluster resources as dictated by their account permissions.
 
 <!--- ref gridsphere and science gateways that were dedicated tools and that tarun or something that we looked at around 2017 -->
@@ -147,11 +147,60 @@ Enhancements to the RCS network interface are under consideration to expand serv
 
 ## Application Routers
 
-This is the proxy interfacing and tooling developed.
+OOD provides a web-native experience for HPC.
+In order to operate the full HPC stack under this model, it is necessary to have control over all aspect of user interaction with the HPC platform.
+This includes the traditional, secure shell (SSH) interfaces to the system.
+While OOD does provide a web-based solutions for secure shell access via web ssh, many users depend on traditional SSH clients that directly connect to port 22 using the SSH protocol.
+In order to provide a unified experience with the HPC platform to all users, it desirable to manage SSH connections with infrastructure components that share the same functionality of HTTP service.
+In particular, HTTP connections are readily routed to nodes that provide specific services to the user.
+For example, while OOD is delivered as an intgrated single-system solution, it is composed of standard web application components that route authenticated user connections to their own dedicated web server that provides access to HPC resources.
 
-so we can actually say we have the openstack as a front end to our hpc
+If a user has no corresponding HPC account, OOD can be configured to direct the connection to an endpoint designed to handle this scenario.
+Many environments, provide a destination service that enables user account creation.
+We implemented an Account web application that allows users with a defined institutional relationship to create their own HPC account.
+The account app prompts the user to create the account.
+After the user submits the request, the account app interacts with standard HPC system services, exposed as RabbitMQ services, to create the user account.
+Once the account is created the user connection is redirected to OOD, this time passing the account check and passing through to their per-user nginx server where they can interact with the OOD services.
+The self-directed account creation request typically takes less than fifteen seconds to complete.
+This capability ensures authorized users experience little more than a slight account provisioning delay the first time the access the HPC system.
+
+Because user authorization is a standard part of OOD access, the user can also be redicted to their account services page as needed to support HPC operations.
+We define simple states like good_standing, certification_required, and account_hold to facilate operations.
+Only users with accounts in good_standing are allowed to interact with OOD.
+Other states force the user's web connections to the account app so they address any requirements to restablish their good_standing state.
+The account_hold state provides direct control to support personal over individual user access to HPC resources for service events or other user engagements.
+
+This request routing is standard fare for web-native application.
+It enables the creation of rich user experiences that can be consistently implemented across the platform.
+We have further enhanced OOD's implicit account behavior by introducing a dedicated front-end HTTP application router that can control web user access based on additional attributes like group membership.
+Just like OOD, this application router requires authenticated connections.
+Once authenticated via web SSO, the full spectrum of user account attributes can be used to route connections based on state, group membership, or individual identity according to site policies.
+We add dedicated reverse proxy stanzas to the router in order to control the destination.
+This enhanced web connection routing enables the creation of rich user experiences that align with site service delivery goals.
+Because HTTP routing is long established and the requirements for our enahancements are easily satisfied with standard Apache web server features.
+
+HPC is, however, not an exclusively web-based experience.
+The SSH protocol is the dominate user interface to HPC.
+In order to provide a consistent user experience accross HTTP and SSH endpoints, it is desirable for both services to respond similarly to site policies based on a users account status.
+For example, a user whose account is in a hold state should be notified to access the account app via their web browser and prevent from further SSH interaction with the site.
+We have accomplished this with Group Match stanzas in our OpenSSH server configuration.
+More sophisticated routing of valid SSH connections is not possible.
+To accomplish rule-based routing based on user attributes, we implemented an SSH application router using sshpiper, a reverse proxy for SSH built on Golang's SSH library.
+We contributed an enhancement to sshpiper that allows a user's group membership to be use in the routing rules.
+This SSH application router enables user connection routing to preferred login nodes based on site policy or operational requirments.
+The sshpiper routing works by terminating the client-side SSH connection and establising a second internal connection to the desired login node endpoint.
+For password-based authentication, the users credentials are passed to and validated by the login node endpoint.
+For key-based authentication, the user authentication is managed using internal cluster keys shared via the file system.
+This uses the same infrastructure already in place on the HPC system that allows users to transparently access compute nodes running their jobs without prompting for additional authentication.
+
+With the creation of SSH and HTTP application routers, we are able to direct user traffic flows according to our site operational goals.
+This allows to create a coherent user expereince for HPC access that is consistent across both HTTP and SSH endpoints.
+Implementing these routers as software defined infrastructure allows for continuous development of platform features and retains control over the user experience as new capabilities are deployed.
+We descibe our motivating use-case in the Experiment section.
+
+<!--- so we can actually say we have the openstack as a front end to our hpc
 the advantage here is that we can use this same front end regardless of where a physical cluster may actually be located
-openstack gives us cloud-native tooling and sdn to route traffic to desired destinations
+openstack gives us cloud-native tooling and sdn to route traffic to desired destinations -->
 
 ## CICD Pipelines
 
