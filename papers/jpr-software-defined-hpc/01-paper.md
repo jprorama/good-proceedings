@@ -116,8 +116,16 @@ Today's infrastructure leverages these same approaches to provide scalable compu
 ## Research Computing System
 
 Buidlding a cloud native experience.
-In order to align campus research computing infrasture with scalable, cloud-native solutions, we adpopted the data-center-as-the-computer model to create a coherent infrastructure that deliver compute, storage, and networking for research applications.
-We identify this platform as the Research Computing System (RCS), see Fig XXX.
+In order to align campus research computing infrasture with scalable, cloud-native solutions, we adpopted the data-center-as-the-computer model to create a coherent infrastructure that delivers compute, storage, and networking to research applications.
+We identify this platform as the Research Computing System (RCS), see [Fig. %s](#rcs_architecture).
+
+```{figure} images/RCS Architecture.png
+:label: rcs_architecture
+:alt: RCS architicuture following design of warehouse scale machines. Shows batch, vm, and container compute modalities connected to file, block, and object storage modalities via interconnect and peering to external networks.
+
+RCS architicuture following design of warehouse scale machines. Shows batch, vm, and container compute modalities connected to file, block, and object storage modalities via interconnect and peering to external networks.
+```
+
 RCS supports HPC batch, virtual machine cloud, and process container compute modelities.
 The compute services integrate with storage systems that provide high speed parallel file systems, block devices, and object storage.
 Compute and storage are integrated with a network fabric the provides bandwidth for both east-west and north-south traffic flows.
@@ -132,7 +140,7 @@ The current work is not implemented with microservices so this subsystem is not 
 
 In addition to GPFS parallel storage for HPC workloads, RCS leverages Ceph storage subsystems to deliver block and object storage services to OpenStack and Kubernetes based workloads.
 Ceph additionally provides public S3 endpoints for user data and Cephfs as a tiering backend for GPFS.
-The Science DMZ leverages Globus as the I/O interface for moving data to GPFS and allows users to manage other storage systems via additional Globus connectors.
+The Science DMZ peering connection leverages Globus as the I/O interface for moving data to GPFS and allows users to manage other storage systems via additional Globus connectors.
 The campus peering connection provides network access to all other services in the RCS.
 Enhancements to the RCS network interface are under consideration for future services.
 
