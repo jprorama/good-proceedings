@@ -116,8 +116,8 @@ Today's infrastructure leverages these same approaches to provide scalable compu
 ## Research Computing System
 
 Buidlding a cloud native experience.
-In order to align campus research computing infrasture with scalable, cloud-native solutions, we adpopted the data-center-as-the-computer model to create a coherent infrastructure that delivers compute, storage, and networking to research applications.
-We identify this platform as the Research Computing System (RCS), see [Fig. %s](#rcs_architecture).
+In order to align campus research computing infrasture with scalable, cloud-native solutions, we adpopted the data-center-as-the-computer model to create a coherent infrastructure delivering compute, storage, and networking to research applications.
+We identify this platform as a Research Computing System (RCS), see [Fig. %s](#rcs_architecture).
 
 ```{figure} images/RCS Architecture.png
 :label: rcs_architecture
@@ -126,23 +126,24 @@ We identify this platform as the Research Computing System (RCS), see [Fig. %s](
 RCS architicuture following design of warehouse scale machines. Shows batch, vm, and container compute modalities connected to file, block, and object storage modalities via interconnect and peering to external networks.
 ```
 
-RCS supports HPC batch, virtual machine cloud, and process container compute modelities.
-The compute services integrate with storage systems that provide high speed parallel file systems, block devices, and object storage.
+RCS supports HPC batch, virtual machine, and process container compute modelities.
+The compute services integrate with storage systems that provide high throughput parallel file systems, block devices, and object storage.
 Compute and storage are integrated with a network fabric the provides bandwidth for both east-west and north-south traffic flows.
 The RCS interfaces with external networks peering to both campus and R&E network via a Science DMZ segment.
 
-HPC batch computing is built upon a traditional stand-alone compute cluster implemented with Bright Cluster Manager and connected to a GPFS parallel file system.
-The evolution to the RCS design, now positions this infrastructure along-side the VM and container platforms.
-The VM cloud compute capacity is built upon OpenStack which provide comprehensive software defined infrastructure.
-This infrastructure is leveraged to build and operate the application routers, Open OnDemand web service, and CICD workflows describe the in following subsections.
+HPC batch computing is built upon a traditional, stand-alone compute cluster.
+At our site this is implemented with Bright Cluster Manager managed compute nodes connected to a GPFS parallel file system via a dedicated Infiniband network.
+The move to this RCS architecture positions the HPC infrastructure along-side platforms that provide VM and container abstractions to applications.
+The VM ompute capacity is built upon OpenStack which provides a comprehensive software defined infrastructure that enables direct control over the compute, storage and network resources  need by research applications.
+We use this infrastructure to build and operate the application routers, Open OnDemand web services and CICD workflows describe the in following subsections.
 Container compute capacity for RCS is provided by Kubernetes.
-The current work is not implemented with microservices so this subsystem is not discussed further.
+The current work does not leverage microservices so this subsystem is not discussed further.
 
-In addition to GPFS parallel storage for HPC workloads, RCS leverages Ceph storage subsystems to deliver block and object storage services to OpenStack and Kubernetes based workloads.
-Ceph additionally provides public S3 endpoints for user data and Cephfs as a tiering backend for GPFS.
-The Science DMZ peering connection leverages Globus as the I/O interface for moving data to GPFS and allows users to manage other storage systems via additional Globus connectors.
-The campus peering connection provides network access to all other services in the RCS.
-Enhancements to the RCS network interface are under consideration for future services.
+In addition to GPFS parallel storage for HPC workloads, our implementation of RCS leverages Ceph storage subsystems to deliver block and object storage services to OpenStack and Kubernetes based workloads.
+Ceph additionally provides public S3 endpoints for user data and Cephfs as a tiering backend for GPFS to manage cost.
+Research and education (R&E) network peering is provided by a Science DMZ segment (SciDMZ) that leverages Globus as the I/O interface for moving data to GPFS and allows users to manage other storage services via additional Globus connectors.
+The campus peering connection provides network access to all other services in the RCS simplifying compliance with campus IT policies.
+Enhancements to the RCS network interface are under consideration to expand services on the SciDMZ.
 
 ## Application Routers
 
