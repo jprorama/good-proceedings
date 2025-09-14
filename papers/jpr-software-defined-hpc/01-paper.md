@@ -101,7 +101,8 @@ Jetstream2 for at-scale cloud operations
 CRI_XCBC
 - legacy software fabric of the XSEDE project as an early working deployement of a full HPC stack using Ansible
 - provides our foundation for working with cluster environments
-
+the CRI_XCBC project's Ansible code repository.
+This reposity was built to deploy an OpenHPC cluster with enhancements intended to simplify workload migration between local HPC cluster and national resources.
 
 Datacenter as the computer
 
@@ -193,10 +194,7 @@ For password-based authentication, the users credentials are passed to and valid
 For key-based authentication, the user authentication is managed using internal cluster keys shared via the file system.
 This uses the same infrastructure already in place on the HPC system that allows users to transparently access compute nodes running their jobs without prompting for additional authentication.
 
-With the creation of SSH and HTTP application routers, we are able to direct user traffic flows according to our site operational goals.
-This allows to create a coherent user expereince for HPC access that is consistent across both HTTP and SSH endpoints.
-Implementing these routers as software defined infrastructure allows for continuous development of platform features and retains control over the user experience as new capabilities are deployed.
-We descibe our motivating use-case in the Experiment section.
+We descibe our motivating use-case for these application routers in the Experiment section.
 
 <!--- so we can actually say we have the openstack as a front end to our hpc
 the advantage here is that we can use this same front end regardless of where a physical cluster may actually be located
@@ -204,24 +202,38 @@ openstack gives us cloud-native tooling and sdn to route traffic to desired dest
 
 ## CICD Pipelines
 
-Ansible legacy of cri_xcbc
-- note that we now have externalized our cluster deployment to match our production cluster software Bright Cluster Manager
-- the framework still provides the core of our node abstractions for the components in our evironment, specically adding the OOD
-- we started off OOD dev by adding it to cri_xcbc as an integrated part of the pipeline
-- the app routers are built directly in gitlab ci as artificts contstructed directly on the openstack cloud infrastructure
-- show construction of cicd pipelines and how the produce their artifacts
+With the creation of SSH and HTTP application routers, we are able to direct user traffic flows according to our site operational goals.
+This allows us to create a coherent user expereince for HPC access that is consistent across both HTTP and SSH endpoints.
+Implementing these routers as software defined infrastructure allows continuous development of platform features and control over the user experience as new capabilities are deployed.
+
+### Core Infrastructure Builds
+
+We build our automated OOD deployments on VM images constructed using the legacy CRI_XCBC Anisble repository that provides an Infrastructure as Code (IaC) framework for site HPC deployments.
+The motivation for continuing construction on this foundation was to provide developer instantiated platforms that support operation of OOD.
+An OOD deployment is difficult to learn, test, and extend without an HPC cluster with which it integrates.
+DevOps workflows are easier to construct when development and production infrastructure are isolated from each other.
+Developers need to be able to iterrate repeatedly over the build and deploy pipelines.
+In order to write systems applications, developers must be granted complete authority over the software stack that includes the HPC system stack, batch scheduler, and other core platform services.
+Providing developer access to production resources is undersireable and works against the goals to create repeatable builds and deployments.
+
+Extending CRI_XCBC to include OOD inherently provided an HPC platform with which OOD can integrates.
+It also provided all necessary components to develop a web-based, self-service Account app that provides onboarding for users and invokes native HPC account creation services.
+Over time we have abondonded the use of the OpenHPC IaC elements and instead rely on a stand-alone Heat-based deployment of a cluster using Bright Cluster Manager and Bright's (now NVIDIA's) Easy8 developer focused cluster solution.
+This was ultimately necessary to support construction of Bright-specific drivers for our RabbitMQ based account creation services.
+
+While still rooted in CRI_XCBC, OOD and the Account app have become the only components we build out of this IaC framework.
+We run the OOD build and deploy pipelines each day in order to maintain confidence in our ability to construct a complex VM image with many dependencies.
+We use the daily builds of OOD as the foundation for multiple deployments.
+We provide live deployment of the current development head to allow feature and bug fixes to be explored.
+
+### Deployment of HPC Services
+<!---  this is the interface for modern hpc + globus, we do not address globus routing in this work. -->
 
 This is how it's deployed
 
-OOD's success stems not from displacing the traditional command shell but by enhancing the user experience to include web-native applications that sit naturally along-side their traditional cluster interaction.
-A basic deployment provides access to Juptyer notebooks, R-Studio, and a browser-based VNC desktop capable of presenting any traditional GUI applicaiton, like Matlab or QGIS, within the browser.
-All of these web-based applications are easily launched as jobs on cluster compute nodes through simple button clicks in the web browser.
+- the app routers are built directly in gitlab ci as artificts contstructed directly on the openstack cloud infrastructure
+- show construction of cicd pipelines and how the produce their artifacts
 
-The key aspect of the OOD architecture is transparent mapping of browser actions to per-user web servers that run applications under the native cluster identity of the user.
-This allows all actions performed by the user on the cluster, whether via the web or the command shell, to run in the context of their Kaccount and ahere to a consistent security model enforced by the operating system across the cluster.
-User's can only access cluster resources as dictated by their account permissions.
-
-<!---  this is the interface for modern hpc + globus, we do not address globus routing in this work. -->
 for our ssh proxy we use ssh-piper
 our https applications are proxied with a simple Apache proxy with integrated SSO.
 the SSO lets us embed identity into applications by default
