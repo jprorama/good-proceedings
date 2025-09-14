@@ -202,9 +202,20 @@ openstack gives us cloud-native tooling and sdn to route traffic to desired dest
 
 ## CICD Pipelines
 
-With the creation of SSH and HTTP application routers, we are able to direct user traffic flows according to our site operational goals.
-This allows us to create a coherent user expereince for HPC access that is consistent across both HTTP and SSH endpoints.
-Implementing these routers as software defined infrastructure allows continuous development of platform features and control over the user experience as new capabilities are deployed.
+With the creation of SSH and HTTP application routers, we are able to direct user traffic flows to login nodes, OOD, and the account app according to site operational goals.
+This supports creating a coherent user expereince for HPC access that is consistent across both HTTP and SSH endpoints.
+Implementing these routers as software defined infrastructure allows continuous development of platform features and control over the introduction of capabilities as they are deployed.
+We created CICD pipelines with separate build and deploy phases based on the requirements of specific use-cases.
+Both phases leverage Ansible to construct relavent artifacts.
+The RCS cloud subsystem provides the platform for development, build and deployment phases.
+Using OpenStack enables the construction of comprehensive cloud-native workflows for each activity.
+Packer templates are used to construct VM images for our OOD and account app componentes.
+We chose to directly invoke OpenStack CLI commands during deployment as a convenient optimization.
+We have used Terraform for the deploy phase of other system components not featured in this work.
+The separation of build and deploy enables use to construct OOD VM binaries that can be used uniformly in development, test, and production environments.
+The deploy steps can then focus on customizations that meet the need of the specific environment, providing late binding hooks for specific clusters.
+We descibe the build pipeline in the next subsection and the deploy pipeline in the following.
+
 
 ### Core Infrastructure Builds
 
@@ -234,16 +245,6 @@ This is how it's deployed
 - the app routers are built directly in gitlab ci as artificts contstructed directly on the openstack cloud infrastructure
 - show construction of cicd pipelines and how the produce their artifacts
 
-for our ssh proxy we use ssh-piper
-our https applications are proxied with a simple Apache proxy with integrated SSO.
-the SSO lets us embed identity into applications by default
-
-the ssh proxy is responsible for routing ssh connections across an infrastructure of user login nodes to the batch computing system
-user SSH remote-shell connections are routed to an available login node based on the users identity and system settings.
-
-likewise the https proxy is responsible for routing web application across an infrastructure of user owned webservices.
-the http connections are routed based on the user's identity and systems settings
-
 we built a continuous integration and continous deployment (CICD) workflow to facilite maintaining avaialbility of current software releases
 the initial focus was moving our deployment of the ondemand web appliction to the cloud VM abstraction
 the baseline infrastructure model of a virtual machine running on a cloud platform that gives developer access to control infrastructure
@@ -259,15 +260,6 @@ a complex application stack has many dependencies all of which can lead to unexp
 frequent deploys help surface issues with the applicaiton build and the runtime environment
 the ability to observe development changes in a production context provides timely feedback on newly added  application features to ensure they effectively address user need.
 
-also like many sites, we continue to offer SSH access to the batch system via a login node that offers full control over their batch workflows
--- a login node is the classic HPC interface where the user can arrange t their work and schedule th
-ssh connections are hard-wired to specific systems in order to retain access to the process state of the user's shell
-due to their tight integration with the cluster's compute environment, login nodes are often deployed as a minor varient of a compute node that doesn't run batch jobs on hardware identical to the other compute nodes.
-this is a practicle approach that simplifies job development by ensure the user environment during interactive use is identical to the environment during batch use.
-
-this node-specific deploy can make ssh infrastructure feel very static compared to the flexible routing inherent to web architectures,
-
-placing the HPC ssh service on an equal footing with web applications facilitates a uniform approach for maintaining the HPC interface.
 we use ssh.piper to route traffic....
 
 web application and login nodes
@@ -278,11 +270,6 @@ the knightly effort gave us a cicd
 then we built a richer cicd to deploy a number of different systems
 the key additional systems were http and ssh proxy
 they gave us the ability to do canary deployes of all parts of our cluster, not just the ondemand
-
-we did this by separating the physical, compute-derived-login nodes from their function of terminating user SSH connections
-introducing an SSH application proxy that, like the web application proxy, is identity aware and can route connections based on user-specific settings.
-specific users can be transparently routed to sepecifc login nodes
-this transparent ssh proxy is implemented with ssh-pipe a flexible proxy with based on go-ssh with frequent releases that address bugs and feature requests.
 
 we created a build and deploy pipeline for the ssh proxy to validate its infrastructure code using the same model in use for ondemand.
 a cloud VM is built and deployed facilitating review of the current state of the proxy in the production context
@@ -295,6 +282,36 @@ moving the https termination and user authentication of ondemand to the applicat
 with the automated build and deploy of our CICD pipelines, we ensure we can reliably and continuously release the latest improvements to the user experience.
 
 # Experimental setup
+
+<!--- notes from above
+
+for our ssh proxy we use ssh-piper
+our https applications are proxied with a simple Apache proxy with integrated SSO.
+the SSO lets us embed identity into applications by default
+
+
+likewise the https proxy is responsible for routing web application across an infrastructure of user owned webservices.
+the http connections are routed based on the user's identity and systems settings
+
+the ssh proxy is responsible for routing ssh connections across an infrastructure of user login nodes to the batch computing system
+user SSH remote-shell connections are routed to an available login node based on the users identity and system settings.
+
+also like many sites, we continue to offer SSH access to the batch system via a login node that offers full control over their batch workflows
+-- a login node is the classic HPC interface where the user can arrange t their work and schedule th
+ssh connections are hard-wired to specific systems in order to retain access to the process state of the user's shell
+due to their tight integration with the cluster's compute environment, login nodes are often deployed as a minor varient of a compute node that doesn't run batch jobs on hardware identical to the other compute nodes.
+this is a practicle approach that simplifies job development by ensure the user environment during interactive use is identical to the environment during batch use.
+
+this node-specific deploy can make ssh infrastructure feel very static compared to the flexible routing inherent to web architectures,
+
+placing the HPC ssh service on an equal footing with web applications facilitates a uniform approach for maintaining the HPC interface.
+
+we did this by separating the physical, compute-derived-login nodes from their function of terminating user SSH connections
+introducing an SSH application proxy that, like the web application proxy, is identity aware and can route connections based on user-specific settings.
+specific users can be transparently routed to sepecifc login nodes
+this transparent ssh proxy is implemented with ssh-pipe a flexible proxy with based on go-ssh with frequent releases that address bugs and feature requests.
+
+-->
 
 this is the experiment
 this doesn't need to cover how the data is moved
