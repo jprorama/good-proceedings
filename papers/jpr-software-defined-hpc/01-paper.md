@@ -98,10 +98,10 @@ Jetstream2 for at-scale cloud operations
 - advanced OpenStack cloud available through NFS access.
 - demonstrates at-scale operations and provides direct access to advanced hardware through access allocations
 
-CRI_XCBC
+CRI\_XCBC
 - legacy software fabric of the XSEDE project as an early working deployement of a full HPC stack using Ansible
 - provides our foundation for working with cluster environments
-the CRI_XCBC project's Ansible code repository.
+the CRI\_XCBC project's Ansible code repository.
 This reposity was built to deploy an OpenHPC cluster with enhancements intended to simplify workload migration between local HPC cluster and national resources.
 
 Datacenter as the computer
@@ -110,14 +110,14 @@ Datacenter as the computer
 # Software Defined HPC
 
 HPC clusters have long aligned with the principles of software defined infrastucture.
-The original Beowulf cluster design deployed fleets of identical compute nodes under the control of a head node that also supplied the core infrastructure for HPC operations.
-Today's infrastructure leverages these same approaches to provide scalable compute, storage, and network capacty.
+The original Beowulf cluster model deployed fleets of identical compute nodes under the control of a head node that also supplied the core infrastructure for HPC operations.
+Today's IT infrastructure leverages these same approaches to provide scalable compute, storage, and network capacty.
 
 
 ## Research Computing System
 
-Buidlding a cloud native experience.
-In order to align campus research computing infrasture with scalable, cloud-native solutions, we adpopted the data-center-as-the-computer model to create a coherent infrastructure delivering compute, storage, and networking to research applications.
+<!--Buidlding a cloud native experience. -->
+In order to align our campus research computing infrasture with scalable, cloud-native solutions, we adpopted the data-center-as-the-computer model to create a coherent platform delivering compute, storage, and networking to research applications.
 We identify this platform as a Research Computing System (RCS), see [Fig. %s](#rcs_architecture).
 
 ```{figure} images/RCS Architecture.png
@@ -132,12 +132,12 @@ The compute services integrate with storage systems that provide high throughput
 Compute and storage are integrated with a network fabric the provides bandwidth for both east-west and north-south traffic flows.
 The RCS interfaces with external networks peering to both campus and R&E network via a Science DMZ segment.
 
-HPC batch computing is built upon a traditional, stand-alone compute cluster.
+HPC batch computing is implemented via a traditional, stand-alone compute cluster.
 At our site this is implemented with Bright Cluster Manager managed compute nodes connected to a GPFS parallel file system via a dedicated Infiniband network.
 The move to this RCS architecture positions the HPC infrastructure along-side platforms that provide VM and container abstractions to applications.
-The VM ompute capacity is built upon OpenStack which provides a comprehensive software defined infrastructure that enables direct control over the compute, storage and network resources  need by research applications.
-We use this infrastructure to build and operate the application routers, Open OnDemand web services and CICD workflows describe the in following subsections.
-Container compute capacity for RCS is provided by Kubernetes.
+The VM compute capacity is implemented via an on-premise OpenStack private cloud which provides a comprehensive software defined infrastructure enabling direct control over compute, storage and network resources needed to build and operate research applications.
+We use this infrastructure to host the application routers, Open OnDemand web services and CICD workflows describe the in following subsections.
+Container compute capacity for RCS is implmented via Kubernetes.
 The current work does not leverage microservices so this subsystem is not discussed further.
 
 In addition to GPFS parallel storage for HPC workloads, our implementation of RCS leverages Ceph storage subsystems to deliver block and object storage services to OpenStack and Kubernetes based workloads.
@@ -166,10 +166,10 @@ The self-directed account creation request typically takes less than fifteen sec
 This capability ensures authorized users experience little more than a slight account provisioning delay the first time the access the HPC system.
 
 Because user authorization is a standard part of OOD access, the user can also be redicted to their account services page as needed to support HPC operations.
-We define simple states like good_standing, certification_required, and account_hold to facilate operations.
-Only users with accounts in good_standing are allowed to interact with OOD.
-Other states force the user's web connections to the account app so they address any requirements to restablish their good_standing state.
-The account_hold state provides direct control to support personal over individual user access to HPC resources for service events or other user engagements.
+We define simple states like good\_standing, certification\_required, and account\_hold to facilate operations.
+Only users with accounts in good\_standing are allowed to interact with OOD.
+Other states force the user's web connections to the account app so they address any requirements to restablish their good\_standing state.
+The account\_hold state provides direct control to support personal over individual user access to HPC resources for service events or other user engagements.
 
 This request routing is standard fare for web-native application.
 It enables the creation of rich user experiences that can be consistently implemented across the platform.
@@ -204,38 +204,59 @@ openstack gives us cloud-native tooling and sdn to route traffic to desired dest
 
 With the creation of SSH and HTTP application routers, we are able to direct user traffic flows to login nodes, OOD, and the account app according to site operational goals.
 This supports creating a coherent user expereince for HPC access that is consistent across both HTTP and SSH endpoints.
-Implementing these routers as software defined infrastructure allows continuous development of platform features and control over the introduction of capabilities as they are deployed.
+Implementing these routers as software defined infrastructure (SDI) allows continuous development of platform features and control over the introduction of capabilities as they are deployed.
+
+Our CICD workflows are built using GitLab CI/CD.
+We use a dedicated GitLab repository to house the CICD pipelines, following an image factory pattern.
 We created CICD pipelines with separate build and deploy phases based on the requirements of specific use-cases.
 Both phases leverage Ansible to construct relavent artifacts.
-The RCS cloud subsystem provides the platform for development, build and deployment phases.
-Using OpenStack enables the construction of comprehensive cloud-native workflows for each activity.
-Packer templates are used to construct VM images for our OOD and account app componentes.
-We chose to directly invoke OpenStack CLI commands during deployment as a convenient optimization.
+The RCS cloud subsystem provides the infrastructure for development, build, and deployment workflows.
+Using an on-premise cloud enables the construction of comprehensive cloud-native workflows and allows tight integration with campus HPC resources.
+Packer templates are used to construct VM images for OOD and account app componentes.
+We choose to directly invoke OpenStack CLI commands during deployment as a convenient optimization.
 We have used Terraform for the deploy phase of other system components not featured in this work.
-The separation of build and deploy enables use to construct OOD VM binaries that can be used uniformly in development, test, and production environments.
-The deploy steps can then focus on customizations that meet the need of the specific environment, providing late binding hooks for specific clusters.
+The separation of build and deploy steps enables us to construct versioned OOD VM binaries that can be used across development, test, and production environments.
+The deploy steps focus on customizations that meet the needs of the specific environments, providing late binding hooks and other customizations for specific clusters.
 We descibe the build pipeline in the next subsection and the deploy pipeline in the following.
-
 
 ### Core Infrastructure Builds
 
-We build our automated OOD deployments on VM images constructed using the legacy CRI_XCBC Anisble repository that provides an Infrastructure as Code (IaC) framework for site HPC deployments.
-The motivation for continuing construction on this foundation was to provide developer instantiated platforms that support operation of OOD.
-An OOD deployment is difficult to learn, test, and extend without an HPC cluster with which it integrates.
+We build OOD VM images that include all dependencies of it's software stack and additional compenents for integration with our local HPC systems architecture.
+The images are constructed using the legacy CRI\_XCBC Anisble repository.
+CRI\_XCBC project was created under the NSF XSEDE initiatve to provide an infrastructure-as-code (IaC) framework for HPC deployments.
+
+We adopted CRI\_XCBC to provide developer instantiated HPC platforms to implement our original OOD deployment.
+OOD is challenging for early career developers to learn, test, and extend without an HPC cluster with which it integrates.
+In order to write systems applications, developers must be granted complete authority over the software stack that includes the HPC system stack, batch scheduler, and other core platform services.
 DevOps workflows are easier to construct when development and production infrastructure are isolated from each other.
 Developers need to be able to iterrate repeatedly over the build and deploy pipelines.
-In order to write systems applications, developers must be granted complete authority over the software stack that includes the HPC system stack, batch scheduler, and other core platform services.
-Providing developer access to production resources is undersireable and works against the goals to create repeatable builds and deployments.
+Providing developer access to production resources is undesireable and works against the goal of creating repeatable builds and deployments.
+Deploying disposable HPC clusters (dev clusters) as part of the development workflow aids construction of SDI and professional growth.
 
-Extending CRI_XCBC to include OOD inherently provided an HPC platform with which OOD can integrates.
-It also provided all necessary components to develop a web-based, self-service Account app that provides onboarding for users and invokes native HPC account creation services.
-Over time we have abondonded the use of the OpenHPC IaC elements and instead rely on a stand-alone Heat-based deployment of a cluster using Bright Cluster Manager and Bright's (now NVIDIA's) Easy8 developer focused cluster solution.
-This was ultimately necessary to support construction of Bright-specific drivers for our RabbitMQ based account creation services.
+We forked and extended CRI\_XCBC to include Ansible roles to build an OOD image.
+Constructing OOD within the CRI\_XCBC framework provided an HPC platform with which OOD integrates.
+This also provided the necessary components to develop our web-based Account app that enables self-service HPC onboarding for users.
+The account app provides a web UI that invokes native HPC account creation services via a RabbitMQ message bus.
+Over time we abandoned use of the OpenHPC IaC elements from the CRI_XCBC framework.
+We now rely on stand-alone Heat-based deployment of dev clusters built using Bright Cluster Manager (BCM) and the NVIDIA (formerly Bright Computing) Easy8 developer-focused cluster framework.
+We use this cluster management infrastructure on our production cluster.
+This move was necessary to support construction of BCM-specific drivers for our RabbitMQ based account creation services.
 
+A dedicated image factory repository uses GitLab CI/CD to construct the OOD and account application images by ingesting external Ansible rules from our CRI\_XCBC fork.
+The Ansible framework is executed during the Packer image build.
+The images are stored in the OpenStack Glance image repository and made available to developer and production projects.
+This approach ensures we can track and test the latest changes to the IaC repositories and povide versioned images for development and production use.
+To that end, we execute a daily build of our OOD image to ensure the construction remains viable and surfaces problems with build dependencies in a timely fashion.
+Long delays between builds can otherwise lead to unexpected failures when it becomes necessary to update configurations in response to bugs or changes in operation.
+The daily build also supports deployment of the development head to review feature improvements against our production HPC system.
+We use this approach to enable the introduction of new OOD applications through the addition of an app-specific Ansible role in our CRI\_XCBC repo.
+
+<!--- following may not be necessary 
 While still rooted in CRI_XCBC, OOD and the Account app have become the only components we build out of this IaC framework.
 We run the OOD build and deploy pipelines each day in order to maintain confidence in our ability to construct a complex VM image with many dependencies.
 We use the daily builds of OOD as the foundation for multiple deployments.
 We provide live deployment of the current development head to allow feature and bug fixes to be explored.
+-->
 
 ### Deployment of HPC Services
 <!---  this is the interface for modern hpc + globus, we do not address globus routing in this work. -->
@@ -355,6 +376,8 @@ not only do we need to script the constructuion of specfic nodes so they contain
 we also need to control the instanciation of node and ensure they are properly integrated their to the production network
 such control is common during development phases.
 many production envrionments are manually configuration, they creates a disconnect between the desired automation of CICD pipelines and the reality of the statically configured last mile of connectivity.
+
+<!--- note disaggration of ood and account app -->
 
 moving services to a cloud native model is necessary to ensure the steps that are built and tested during development are valid for the production environment.
 by relocating user-aware connection routing to our application proxies for ssh and web applications we were able to focus the CICD pipeline on nodes that can be readily hosted on a cloud platform that supports the VM abstraction.
