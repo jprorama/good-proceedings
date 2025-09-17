@@ -261,46 +261,52 @@ We provide live deployment of the current development head to allow feature and 
 ### Deployment of HPC Services
 <!---  this is the interface for modern hpc + globus, we do not address globus routing in this work. -->
 
+We created deploy pipelines for the HTTP and SSH application routers and the OOD and account application web applications.
+The application routers are built from stock OS images, currently Alama9, that are customized during deploy with Ansible rules to include the HTTP and SSH servers configured to authenticate the user and then route to the correct backend service.
+We deploy the HTTP and SSH on services to separate VMs for ease of construction and to facilitate service scaling if needed.
+The HTTP application router is a standard Apache reverse proxy that includes SAML-based WebSSO using Shibboleth service provider components.
+Once the user identy is know, an LDAP lookup against the HPC cluster's account database to gather group memberships.
+We use membership in specifc groups to choose the target OOD backend.
+
+The SSH application router is built using sshpiper, a Golang SSH proxy server implemented on the Golang SSH library.
+The sshpiper server is built from source with Ansible during deploy.
+Additional Ansible tasks are used to configure the host to integrate with the HPC cluster system environment.
+The key parts of this configuration include system level user account integration to support user account validation for the SSH protocol.
+User home directories to be mounted via NFS to support standard user-level ssh configuration, e.g. ordinary management of the authorized_keys files for key-based authentication.
+The SSH application router operates much like the familar login node on any cluster with the exception that all SSH connections are passed through the application router.
+No user shells are run on the application router.
+The SSH router transparently establishes a second ssh connection to the internal termination point for the desired login node, where the user shell is started.
+All user SSH based user interaction with the cluster will occur from the login node that hosts the shell process.
+
+We deploy the OOD and account apps from the VM image created during the build phase described above.
+Using prebuilt VM images for OOD results in shorted deploy time.
+We use the concept of late-binding to the customize the deployed image with the configuration required to interface with a specific cluster environment.
+An OOD node has cluster integration expectations similar to login nodes.\
+We characterize the late binding as interfacing the node with the clusters name resolution (DNS), account lookup (LDAP), file namespace (NFS), and batch job submission (Slurm).
+The Ansible coded deploy steps adjust the pre-built image to interface with these necessary cluster services.
+
+In all cases, we initiate the Ansible deploy steps during node instanciation using cloud-init user-data scripts.
+These scripts are injected into the node by the cloud platforma and executed on the node during instance startup.
+The deploy pipelines directly execute commands that generate the user data script which is then passed to the invoked openstack CLI commands that instanciate the node.
+After the node is intantiated, the pipeline assignes public floating IP address for external and cluster-internal networks to enaable the node to accept user connections and interact with cluster services.
+
+We use a blue-green deployment model where the node for a service is deployed using a non-production endpoint address.
+Operation of the newly deployed node is validated in the blue state.
+If the service is operating as expected, the services public IP address is moved to the newly deploy node.
+This simplifies our migration to newly deployed services and avoids service interruption because the software define network service of the cloud platform provide a clean transtion for traffic flows.
+
+There are many ways to handle this deployment cut of over.
+Our current approach use manual IP address cutover after accept test are performed.
+More advanced deploy pipelines could include automatic validation modeled after test-driven development.
+These automated build and deploy of our CICD pipelines help ensure we can reliably and continuously release the latest improvements to the user experience.
+
+<!---
 This is how it's deployed
 
 - the app routers are built directly in gitlab ci as artificts contstructed directly on the openstack cloud infrastructure
 - show construction of cicd pipelines and how the produce their artifacts
+-->
 
-we built a continuous integration and continous deployment (CICD) workflow to facilite maintaining avaialbility of current software releases
-the initial focus was moving our deployment of the ondemand web appliction to the cloud VM abstraction
-the baseline infrastructure model of a virtual machine running on a cloud platform that gives developer access to control infrastructure
-this access is the foundation for maintaining releases with infrastructure as code practices.
-
-we built workflows to maintain the key parts of our user interface
-we started with ondemand because web native apps can be made to flexibility define the user interface
-our first workflow did a nightly build and deploy of an ondemand instance that incorporated the latest commits of infrastructure codebase
-this nightly instance is operational and available to users who prefer or depend upon our latest updates.
-the nightly instances serves as a canary deploy for ondmeand
-build or deploy failures of the nightly instance provide timely feedback on issues with our infrastructure codebase.
-a complex application stack has many dependencies all of which can lead to unexpected errors
-frequent deploys help surface issues with the applicaiton build and the runtime environment
-the ability to observe development changes in a production context provides timely feedback on newly added  application features to ensure they effectively address user need.
-
-we use ssh.piper to route traffic....
-
-web application and login nodes
-the adoption of the cloud VM abstraction for the entire user interface
-this
-
-the knightly effort gave us a cicd
-then we built a richer cicd to deploy a number of different systems
-the key additional systems were http and ssh proxy
-they gave us the ability to do canary deployes of all parts of our cluster, not just the ondemand
-
-we created a build and deploy pipeline for the ssh proxy to validate its infrastructure code using the same model in use for ondemand.
-a cloud VM is built and deployed facilitating review of the current state of the proxy in the production context
-with the latest release in place and validated, we follow a blue-green deployment strategy to direct ssh traffic to the new instance.
-as a proxy, it continues to route users to their designated login nodes.
-
-the final build and deploy pipeline is used to constrcut the ondemand applicaiton proxy
-moving the https termination and user authentication of ondemand to the application proxy allows us to also route specific users to sepcific ondemand instances
-
-with the automated build and deploy of our CICD pipelines, we ensure we can reliably and continuously release the latest improvements to the user experience.
 
 # Experimental setup
 
@@ -342,6 +348,18 @@ conclusion can mention the complexity of the data movement as separate work
 this does acheive our ability to fluidly move people and projects
 conclusion can note the side effect is more autonomy of science engagement which is helping drive our goal for end-user managed infrastructure.
 
+that should really about working from a defined image and customizing it via the user-data section to connet it to the runtime environment.
+
+this is really where a picture could come in handy
+we build images via packer with possible external repo
+
+we build deploys from defined images
+add hooks for late binding to target env
+this is doen via user-data and direct openstack cli
+
+this infrastructure relies on gitlab runner for packer and other deploy tasks
+
+
 our motivation for this infrastucture is to facilitate the forward migration of our user community as our infrastructure evoles and adapts to emerging requirements.
 our rcs has subsystems that provide rich abstractions over infrastruture out of the box
 the VM and container compute systems are very mature.
@@ -364,6 +382,10 @@ once a user's data is migrated to the new storage system that user's ssh and web
 this is accomplished by updating the migration state for the user
 when the ssh and web application proxies receive a connection request for the migrated user they look up the user's migration status based on their identity.
 accordingly, the migrated user is routed to the login node and ondmand node belonging to the new cluster environment.
+
+with the latest release in place and validated, we follow a blue-green deployment strategy to direct ssh traffic to the new instance.
+as a proxy, it continues to route users to their designated login nodes.
+
 
 these CICD built and deployed application proxies have been successfully used in production for a number of months.
 the CICD framework was crucial to the development of the application proxies and has facilited maintaining ondemand services for the distinct cluster environments
