@@ -339,6 +339,12 @@ specific users can be transparently routed to sepecifc login nodes
 this transparent ssh proxy is implemented with ssh-pipe a flexible proxy with based on go-ssh with frequent releases that address bugs and feature requests.
 
 -->
+```{figure} images/AB_cluster.png
+:label: ab_cluster
+:alt: Software Defined HPC infrastructure used to manage a two cluster deployment where a single visible entry point leads to two differrent cluster fabrics, transparent to the user experience.
+
+An arrangement of the software defined HPC infrastructure to route users to two different cluster environments based on their user identity and group membership. Group A web and ssh connections are routed to Cluster A and group B connections are routed to Cluster B.
+```
 
 this is the experiment
 this doesn't need to cover how the data is moved
