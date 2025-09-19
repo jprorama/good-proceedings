@@ -77,36 +77,31 @@ We conclude the paper with a discussion of future directions.
 
 # Related Work
 
+Research generates data that must be processed, analyzed, and stored in order to derive scientific insight.
+Information Technology (IT) infrastructure is fundamental to the creation of research applications that process data.
+Access to infrastructure determines the success or failure of research workflows that depend on computing.
+Cloud computing increases access to infrastructure by provide software defined abstractions for the compute, storage, and network resources needed to build applications.
+OpenStack is an Open Source Software (OSS) platfrom that allows a site to encapsulate its physical IT hardware and present cloud-native abstractions for compute, storage, and network resources via software defind infrastructure.
+This allows platform users to access software defined IT infrastructure to build applications using cloud-native development paradigms.
+IT staff can guard access to the physical systems running OpenStack to ensure secure operations while democratizing access to resource abstractions that enable developers to build applications.
+Deploying OpenStack to provide infrastructure for research applications provides autonomy for IT operations and research software development.
 
-<!--- 
+The NSF-funded Jetstream2 project is an at-scale cloud computing environment available to researchers through the NSF ACCESS program.
+The NFS ACCESS program is the successor to the XSEDE program which nurtured the development of national HPC resources to support research workflows.
+Jetstream2 is built using OpenStack to provide cloud-native abstract research applications that need compute, storage, and network resources.
+Jetstream2 allocates capacity for CPU, GPU, and storage using ACCESS-granted service unit credits.
+Jetstream2 demonstrates at-scale operations of OpenStack clouds and provides autonomous access to advanced hardware for the development of research workflows.
 
-related work is data center as computer ideas
-jetstream2
-and maybe micro services?
-maybe ssh.piper
-cri_xcbc?
+CRI\_XCBC is legacy software project created by the XSEDE program as working example of deployable and exstensible HPC stack that used Ansible playbooks to deploy and OpenHPC defined infrastructure.
+We maintain a site-specific fork of CRI\_XCBC to as our foundation for software defined cluster environments.
+We extended this code-base to include OOD web services as part of the Ansible-deployed OpenHPC cluster.
+We leverage that solution in this work.
 
--->
-
-OpenStack for on-site cloud-native infrastructure.
-- it is a software defined data center infrastructure
-- advanced software defined infrastructure across compute, storage, and network
-- in a typical deploy, it overlays SDN capabilities across an L2 fabric and bridges the internal SDN stack with traditional site networks.
-- advanced deploys can integrate the SDN stack provided by neutron and ovn to control physical devices via openVSwitch and controller devices? can't recall words
-- supports L3 to the host
-
-Jetstream2 for at-scale cloud operations
-- advanced OpenStack cloud available through NFS access.
-- demonstrates at-scale operations and provides direct access to advanced hardware through access allocations
-
-CRI\_XCBC
-- legacy software fabric of the XSEDE project as an early working deployement of a full HPC stack using Ansible
-- provides our foundation for working with cluster environments
-the CRI\_XCBC project's Ansible code repository.
-This reposity was built to deploy an OpenHPC cluster with enhancements intended to simplify workload migration between local HPC cluster and national resources.
-
-Datacenter as the computer
-
+Datacenter as a computer is a warehouse scale computing paradigm that treats the data center a massive computer.
+While not all computing systems are warehouse scale, the paradigm facilitates systems development by demostrating how computer system abstractions can simplify the organization of complex multi-site and multi-system infrasture deployments.
+Using these abstractions allows operators, administrators, and users of the system to communicate and stratigize on specific functions or services without risking a loss of interoperability.
+Such layered abstractions have been crucial to the success of global network initiatives.
+We adopted this paradigm to organize our research computing infrastructure.
 
 # Software Defined HPC
 
