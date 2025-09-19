@@ -399,19 +399,22 @@ conclusion can note the side effect is more autonomy of science engagement which
 
 # Conclusion
 
-infrastructure as code demands programatic control over infrastructure.
-not only do we need to script the constructuion of specfic nodes so they contain the appropriate components and configurations to build an application
-we also need to control the instanciation of node and ensure they are properly integrated their to the production network
-such control is common during development phases.
-many production envrionments are manually configuration, they creates a disconnect between the desired automation of CICD pipelines and the reality of the statically configured last mile of connectivity.
+Infrastructure as code demands programatic control over infrastructure.
+Automated constructuion of nodes ensures they reliably contain appropriate components and configurations to implement the service.
+Programatic control of infrastructure ensures services are properly integrated with the production environment.
+These controls are common during development.
+Ensuring the same experience for production reduces deployment friction and leads to improvement in the user experience.
+Moving services to a cloud native model is necessary to ensure the steps that are built and tested during development are valid for the production environment.
 
 <!--- note disaggration of ood and account app -->
 
-moving services to a cloud native model is necessary to ensure the steps that are built and tested during development are valid for the production environment.
-by relocating user-aware connection routing to our application proxies for ssh and web applications we were able to focus the CICD pipeline on nodes that can be readily hosted on a cloud platform that supports the VM abstraction.
-we provide an on-site cloud computing environment with on OpenStack.
-we used this environment as our cloud-native target for the CICD pipelines.
-by exposing or cluster-specific network as provider network to our production environment, we are able to control the development and production using identical infrastructure code for both development and production deployments.
-this ensures we don't introduce untested code just to address bespoke configuration in production.
-the infrastructure code remains the same in all environments and only the configuration values change based on dev or prod targets.
-this software controlled infrastructure is critical for a building reliable automation pipelines that are responsive to bug fixes and new application features.
+We introduced user-based application routing for SSH and HTTP connections to the HPC environment.
+We leveraged on-site cloud computing resources in our RCS to build CICD pipelines for our applicaiton routers and OOD services creating a SDHPC framework.
+This framework has facilated a data and cluster migration project while minimizing user disruptions.
+The SDHPC is responsive to bug fixes and supports timely deployment of feature enhancements.
+
+Data migrations are complex undertakings.
+The longer data sits still the harder it becomes to move.
+This experience is leading us to explore continuous data movement to reduce the dwell time and dependency on specific storage hardware.
+We are also expanding use of the image factory model to simplify introduction of new HPC service and reduce maintanence overhead.
+By creating consistent CICD workflows between development and production to deploy application routers we have moved our HPC cluster to a cloud-native orientation that provides comprehensive control over the user experience.
