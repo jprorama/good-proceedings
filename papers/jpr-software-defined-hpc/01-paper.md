@@ -34,6 +34,7 @@ keywords:
   - Infrastructure as Code
   - CICD
   - Cloud
+  - AI Infrastructure
 ---
 
 
@@ -202,6 +203,18 @@ openstack gives us cloud-native tooling and sdn to route traffic to desired dest
 
 ## CICD Pipelines
 
+<!--- that should really about working from a defined image and customizing it via the user-data section to connet it to the runtime environment.
+
+this is really where a picture could come in handy
+we build images via packer with possible external repo
+
+we build deploys from defined images
+add hooks for late binding to target env
+this is doen via user-data and direct openstack cli
+
+this infrastructure relies on gitlab runner for packer and other deploy tasks
+-->
+
 With the creation of SSH and HTTP application routers, we are able to direct user traffic flows to login nodes, OOD, and the account app according to site operational goals.
 This supports creating a coherent user expereince for HPC access that is consistent across both HTTP and SSH endpoints.
 Implementing these routers as software defined infrastructure (SDI) allows continuous development of platform features and control over the introduction of capabilities as they are deployed.
@@ -308,94 +321,81 @@ This is how it's deployed
 -->
 
 
-# Experimental setup
+# SDHPC for Data and Cluster Migration
 
-<!--- notes from above
-
-for our ssh proxy we use ssh-piper
-our https applications are proxied with a simple Apache proxy with integrated SSO.
-the SSO lets us embed identity into applications by default
-
-
-likewise the https proxy is responsible for routing web application across an infrastructure of user owned webservices.
-the http connections are routed based on the user's identity and systems settings
-
-the ssh proxy is responsible for routing ssh connections across an infrastructure of user login nodes to the batch computing system
-user SSH remote-shell connections are routed to an available login node based on the users identity and system settings.
-
-also like many sites, we continue to offer SSH access to the batch system via a login node that offers full control over their batch workflows
--- a login node is the classic HPC interface where the user can arrange t their work and schedule th
-ssh connections are hard-wired to specific systems in order to retain access to the process state of the user's shell
-due to their tight integration with the cluster's compute environment, login nodes are often deployed as a minor varient of a compute node that doesn't run batch jobs on hardware identical to the other compute nodes.
-this is a practicle approach that simplifies job development by ensure the user environment during interactive use is identical to the environment during batch use.
-
-this node-specific deploy can make ssh infrastructure feel very static compared to the flexible routing inherent to web architectures,
-
-placing the HPC ssh service on an equal footing with web applications facilitates a uniform approach for maintaining the HPC interface.
-
-we did this by separating the physical, compute-derived-login nodes from their function of terminating user SSH connections
-introducing an SSH application proxy that, like the web application proxy, is identity aware and can route connections based on user-specific settings.
-specific users can be transparently routed to sepecifc login nodes
-this transparent ssh proxy is implemented with ssh-pipe a flexible proxy with based on go-ssh with frequent releases that address bugs and feature requests.
-
--->
 ```{figure} images/AB_cluster.png
 :label: ab_cluster
-:alt: Software Defined HPC infrastructure used to manage a two cluster deployment where a single visible entry point leads to two differrent cluster fabrics, transparent to the user experience.
+:width: 100%
+:alt: Software Defined HPC framework used to manage a two cluster deployment where a single visible entry point leads to two differrent cluster fabrics, transparent to the user experience.
 
-An arrangement of the software defined HPC infrastructure to route users to two different cluster environments based on their user identity and group membership. Group A web and ssh connections are routed to Cluster A and group B connections are routed to Cluster B.
+An arrangement of the Software Defined HPC (SDHPC) framework to route users to distinct cluster environments based on their user identity and group membership. Group A web and ssh connections are routed to Cluster A and group B connections are routed to Cluster B.
 ```
 
-this is the experiment
-this doesn't need to cover how the data is moved
-that's really opaque to the deployment
-we can just say we can place accounts on hold, do final sync, and route the user to their new space
+The Software Defined HPC (SDHPC)_framework provides features that enable a variety of service developement and operations workflows.
+We introduced SDHPC to maintain front-end application routers for our traditional campus HPC user interfaces to support a multi-phase migration of data and infrastructure in our RCS.
+The framework was developed in response to a confluence of events.
+We were faced with vendor relationship changes, product licensing changes, product lifecycle transitions, data center power constraints, storage demand growth, and budgetary constraints.
+The GPFS-based, high-performance storage tier for the campus HPC system needed to move to the latest supported version.
+Due to evolutions in the vendor landscape, this neccessitated moving petabytes of existing data to new hardware from a new vendor.
+Power constraints in the on-campus data center drove decisions to consolidate HPC CPU resources alongside other RCS compute resources in newly available high-powered racks at a nearby commercial data center already hosting our HPC GPU resources and the cloud and container components of RCS.
+The new facilities provided sufficient power to support anticipated growth of our compute capacity across RCS.
+This consolidation would also return HPC operations to a single Infiniband segment serving all HPC compute resources with access to the updated GPFS platform, which includes an NVMe performance tier to support I/O throughput demands for emerging AI workloads.
+The compute node consilidate freed on-campus data center space to allow expansion of the capacity tier storage provided by Ceph.
+This growth was designed to leveray annual operating budgets through multi-year infrastucture improvement cycles.
+The approach allowed us to maximize GPFS performance for HPC applications and maximize storage capacity for large data sets a unified namespace by leveraging policy-based tiering of infrequently used data to a more granular, lower cost storage platform powered by Ceph.
+
+The SDHPC framework supports balancing competing priorities.
+[Figure %s](#ab_cluster) shows our initial use-case to migrate the HPC user community from the original GPFS storage platform to the new, tiered solution.
+Implementing the storage migration required reconstructing the RCS HPC subsystem in new data center facilities.
+In order to avoid extended downtime for the entire HPC community to accommodate data movement and system relocation, we created an initial footprint of HPC nodes as a seperate cluster attached to the new GPFS platform.
+We designate Cluster A in the figure as the HPC resource assocate with the original storage platfrom  and Cluster B as the HPC resources associate with the new storage platform.
+This approache facilitated incremental movement of user and HPC capacity as data and data center migritations completed.
+It also provided a load testing ramp for the new tiered storage solution.
+
+We were able to move subsets of the user community by designating users as members of goup A or group B to direct their connections to cluster A or cluster B, respectfully, depending on the location of their data.
+The assignements are transparent to the user.
+The SSH and HTTP endpoint names remain the same, with application connections routed to the appropriate servers.
+The file system namespace is maintained across storage systems with appropriate bind mounts.
+Job submissions remain the same, with resource scheduling modified using SLURM a job submit plugin that routes user jobs using the same group names to compute nodes connected to the appropriate storage platform housing their data.
+Keeping the use experience consistent during this transition, minimized the cognitive load on users, avoided requirement to change workflows, and furthered the creation of a managed HPC user experience that facilitates future changes.
+Each subset of migrated users effectively experiences a blue-green deployment model.
+Their connections are cut over to the new service when their data migration is validated.
+
+The cloud services of the RCS platform provide an ideal hosting environment for this infrastructure.
+The comprehensive software defined infrastructure provided by OpenStack enables the creation of cloud-native development and operations workflows.
+We provisioned the components for application routing and cluster B's OOD node in an OpenStack project dedicated to HPC operations.
+The project is authorized to access campus and cluster provider networks made accessible through OpenStack SDN services.
+This allows the services to accept user connections that can be routed to the desired cluster nodes.
+We route users of cluster A to it's existing login and OOD services.
+We route users of cluster B to a newly provisioned physical login node and VM instance OOD, hosted in the same project.
+We chose to retain a physical login node for Cluster B to avoid performance scaling concerns and because of the ease with which these can be deployed using the traditonal cluster managers.
+The cloud-based applicaition routers and OOD instance have access all necessary cluster services via the cluster provider network.
+We use NFS to share the storage namespace with the SSH application router and OOD VM, as opposed to native GPFS clients as is the case with physical nodes connected to respective InfiniBand fabrics of the cluster environment.
+The storage workloads for sshpiper routing and OOD interaction are relatively light and have not presented performance issues using NFS.
+
+The cloud hosting envirnoment is also a natural fit for CICD driven developement and production workflows.
+A self-hosted GitLab instance provides CICD tooling to develop and deploy the SDHPC into production using a dedicated hpc-factory project.
+Developers contribute improvements to the hpc-factory which are validated with integration pipelines.
+New releases are delivered to production in a timely manor using deployment pipelines.
+
+This provides familar software development paradigms that enable contributions from a broader community.
+It takes time to learn the full spectrum of HPC operations.
+Seasoned professionals are responsible for daily cluster operations and often do not have time for relatively minor updates to non-core services.
+Enabling early career developers to focus on more narrowly scoped services and successfully contribute features.
+
+The most significant advantage of this approach is to reduce the friction between development and production environments.
+Traditional approaches deploy ancillary HPC services to physical hardware in close proximity to the cluster.
+This introduces a technology gap between how production nodes attached to the HPC fabric are managed versus how these services are operated during developement.
+That friction frequently leads to delays in updating services like OOD because they are deployed with to dedicated hardware with manual steps excuted by core operations staff.
+Reducing this friction increases the velocity of releases and allows the HPC platform to more easily adapt to user requirements. 
+Another advantage is that the same services can be deployed to any cloud environment which supports the construction of HPC environments on the most cost-effective platforms.
+
+
+<!--- 
 conclusion can mention the complexity of the data movement as separate work
 this does acheive our ability to fluidly move people and projects
 conclusion can note the side effect is more autonomy of science engagement which is helping drive our goal for end-user managed infrastructure.
-
-that should really about working from a defined image and customizing it via the user-data section to connet it to the runtime environment.
-
-this is really where a picture could come in handy
-we build images via packer with possible external repo
-
-we build deploys from defined images
-add hooks for late binding to target env
-this is doen via user-data and direct openstack cli
-
-this infrastructure relies on gitlab runner for packer and other deploy tasks
-
-
-our motivation for this infrastucture is to facilitate the forward migration of our user community as our infrastructure evoles and adapts to emerging requirements.
-our rcs has subsystems that provide rich abstractions over infrastruture out of the box
-the VM and container compute systems are very mature.
-they provide user access to infrastructure that operates like mainstream cloud native platforms.
-
-our hpc batch compute system is also very adept at evolving with application demand
-we maintain multiple  generations of hardware that are made available to the batch system.
-the batch computing systems strenth is that access to these resource is coordinated via the batch system
-users request the specific hardware they need to run their applications and on the systems with that hardware
-our most demanding evolationary application domain frequently  demands GPU capabilities
-and we invest in systems to address that compute demand
-
-we used the identity based routing capabilities to facilate migrating user data across a version and vendor upgrade of our primary HPC storage subsystem.
-we created a new cluster environment configured to use the new storage subsystem.
-both the existing and new cluster environment has a dedicated login node for SSH sessions and dedicated ondemand node for web applications that integrated with the the existing and new storage subsystem, respectively.
-
-each cluster environment is tied to specific storage subsystems, therefor users need to be routed the existing or new cluster environment depending on where their data is located.
-the user data migration worfkow begins with all user data located on the existing storage subsystem and all user ssh and web connections routing to the existing cluster environment
-once a user's data is migrated to the new storage system that user's ssh and web connections must route to the new compute environment.
-this is accomplished by updating the migration state for the user
-when the ssh and web application proxies receive a connection request for the migrated user they look up the user's migration status based on their identity.
-accordingly, the migrated user is routed to the login node and ondmand node belonging to the new cluster environment.
-
-with the latest release in place and validated, we follow a blue-green deployment strategy to direct ssh traffic to the new instance.
-as a proxy, it continues to route users to their designated login nodes.
-
-
-these CICD built and deployed application proxies have been successfully used in production for a number of months.
-the CICD framework was crucial to the development of the application proxies and has facilited maintaining ondemand services for the distinct cluster environments
-this automated deployment workflow enbles deploying new features and bug fixes for actively developed services into our production environment with confidence that the systems remain consistent across builds through a curated infrastructure as code framework.
+-->
 
 # Conclusion
 
