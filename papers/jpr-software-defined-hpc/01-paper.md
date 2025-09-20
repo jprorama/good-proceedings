@@ -347,14 +347,25 @@ We designate Cluster A in the figure as the HPC resource associate with the orig
 This approach facilitated incremental movement of user and HPC capacity as data and data center migrations completed.
 It also provided a load testing ramp for the new tiered storage solution.
 
-We were able to move subsets of the user community by designating users as members of group A or group B to direct their connections to cluster A or cluster B, respectfully, depending on the location of their data.
-The assignments are transparent to the user.
-The SSH and HTTP endpoint names remain the same, with application connections routed to the appropriate servers.
-The file system namespace is maintained across storage systems with appropriate bind mounts.
-Job submissions remain the same, with resource scheduling modified using SLURM a job submit plugin that routes user jobs using the same group names to compute nodes connected to the appropriate storage platform housing their data.
-Keeping the use experience consistent during this transition, minimized the cognitive load on users, avoided requirement to change workflows, and furthered the creation of a managed HPC user experience that facilitates future changes.
-Each subset of migrated users effectively experiences a blue-green deployment model.
-Their connections are cut over to the new service when their data migration is validated.
+We were able to move subsets of the user community by designating users accounts as members of group A or group B to direct their connections to cluster A or cluster B, respectfully, depending on the location of account data.
+These assignments are transparent to the end user.
+The SSH and HTTP endpoints remain the same for all users regardless of their assigned cluster.
+SSH and HTTP application connections are routed to the appropriate nodes.
+The file system namespace is consistent across storage systems using bind mounts in each cluster.
+The job submission experience remains the same.
+Resource scheduling is modified using the SLURM job submit plugin to route user jobs to compute nodes connected to the storage platform housing their data.
+The same group name mechanism used by front-end application routers modified submitted jobs to tag them with a feature to select appropriate nodes within a partition.
+
+Keeping the user experience consistent during this transition minimizes the cognitive load on users by avoiding changes to HPC workflows.
+User connections are routed to the cluster with the new storage system when their data migration is complete.
+All user data is seeded to the new storage system with regular synchronization runs using dsync from mpiFileUtils.
+When the user's migration from Cluster A to Cluster B is scheduled, their account is place on hold to avoid changes to their data.
+A final sync from the source system is performed to capture any changes since the most recent seed point.
+Their file namespace is stubbed into the new GPFS front end from the Cephfs capacity tier.
+Their cluster assignment group is updated and their account hold is released.
+From then on their connections are routed to the Cluster B.
+From the user perspective, each migrated user effectively experiences a blue-green deployment model.
+They are cut over to the new production system when it is validated as operational for their account.
 
 The cloud services of the RCS platform provide an ideal hosting environment for this infrastructure.
 The comprehensive software defined infrastructure provided by OpenStack enables the creation of cloud-native development and operations workflows.
@@ -407,6 +418,12 @@ We introduced user-based application routing for SSH and HTTP connections to the
 We leveraged on-site cloud computing resources in our RCS to build CICD pipelines for our application routers and OOD services creating a SDHPC framework.
 This framework has facilitated a data and cluster migration project while minimizing user disruptions.
 The SDHPC is responsive to bug fixes and supports timely deployment of feature enhancements.
+
+These new platform features help create a managed HPC user experience.
+Policy-based routing of user workloads maintains service availability in the face of significant changes to underlying systems.
+It has facilitated data migration for a major storage upgrade and will support additional improvements to the HPC system in the future.
+Using flexible, modern paradigms like CICD creates testable features with reduced development time and reliable deployments.
+Providing stable services that can be enhance through continuous development and capacity expansion is the goal of cloud-native platforms.
 
 Data migrations are complex undertakings.
 The longer data sits still the harder it becomes to move.
