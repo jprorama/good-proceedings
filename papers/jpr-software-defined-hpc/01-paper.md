@@ -67,7 +67,7 @@ We extended ssh.piper, an open-source SSH router built on top of Go ssh, to incl
 <!--- we should show a picture of this here? -->
 
 Operating cloud-native infrastructure at-scale is improved with development processes that leverage continuous integration and continuous deployment (CICD) methodologies.
-To that end, we created a CICD workflow to build and deploy our application routing front-end nodes and the Open On Demand web services.
+To that end, we created a GitLab CI/CD workflow to build and deploy our application routing front-end nodes and the Open On Demand web services.
 This workflow ensures that we can deliver features and fix bugs through regular deployments of this software-defined infrastructure.
 
 In the next section we highlight trends in the design of large-scale systems in industry and research that are driving evolution toward cloud-native HPC infrastructure.
@@ -94,8 +94,8 @@ Jetstream2 demonstrates at-scale operations of OpenStack clouds and provides aut
 
 CRI\_XCBC is legacy software project created by the XSEDE program as working example of deployable and extensible HPC stack that used Ansible playbooks to deploy and OpenHPC defined infrastructure.
 We maintain a site-specific fork of CRI\_XCBC to as our foundation for software defined cluster environments.
-We extended this code-base to include OOD web services as part of the Ansible-deployed OpenHPC cluster.
-We leverage that solution in this work.
+We extended this code-base to include OOD web services as part of the Ansible-deployed OpenHPC cluster. @Tripathi2020
+We further extend this Ansible code-base in this work.
 
 Data center as a computer is a warehouse scale computing paradigm that treats the data center a massive computer.
 While not all computing systems are warehouse scale, the paradigm facilitates systems development by demonstrating how computer system abstractions can simplify the organization of complex multi-site and multi-system infrastructure deployments.
