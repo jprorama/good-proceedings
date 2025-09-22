@@ -1,4 +1,5 @@
 ---
+numbering: true
 title: Software Defined HPC with Open OnDemand
 exports:
   - format: pdf
@@ -70,11 +71,12 @@ Operating cloud-native infrastructure at-scale is improved with development proc
 To that end, we created a GitLab CI/CD workflow to build and deploy our application routing front-end nodes and the Open On Demand web services @gitlab-cicd.
 This workflow ensures that we can deliver features and fix bugs through regular deployments of the SDHPC infrastructure.
 
-In the next section we highlight trends in the design of large-scale systems in industry and research that are driving evolution toward cloud-native HPC infrastructure.
-In section [sec-tag] we document the design of our software-defined infrastructure to route user connections to desired endpoints and the CICD workflow used to deploy it.
-In section [sec-tag] we discuss the initial use-case for this infrastructure and assess its utility.
+In [](#related-work) we highlight trends in the design of large-scale systems in industry and research that are driving evolution toward cloud-native HPC infrastructure.
+In [](#sdhpc) we document the design of our software-defined infrastructure to route user connections to desired endpoints and the CICD workflow used to deploy it.
+In [](#sdhpc-applied) we discuss the initial use-case for this infrastructure and assess its utility.
 We conclude the paper with a discussion of future directions.
 
+(related-work)=
 # Related Work
 
 Research generates data that must be processed, analyzed, and stored in order to derive scientific insights.
@@ -103,13 +105,14 @@ Using these abstractions allows systems operators, cybersecurity specialist, bus
 Layered and functional abstractions have been crucial to the success of complex multi-domain systems.
 We adopted this paradigm to organize our research computing infrastructure.
 
+(sdhpc)=
 # Software Defined HPC
 
 HPC clusters have long aligned with the principles of software defined infrastructure.
 The original Beowulf cluster model deployed fleets of identical compute nodes under the control of a head node that also supplied the core infrastructure for HPC operations @Reed2014.
 Today's IT infrastructure leverages these same approaches to provide scalable compute, storage, and network capacity.
 
-
+(sdhpc-rcs)=
 ## Research Computing System
 
 <!--Buidlding a cloud native experience. -->
@@ -142,6 +145,7 @@ Research and education (R&E) network peering is provided by a Science DMZ segmen
 The campus peering connection provides network access to all other services in the RCS simplifying compliance with campus IT policies.
 Enhancements to the RCS network interface are under consideration to expand services on the SciDMZ.
 
+(sdhpc-app-router)
 ## Application Routers
 
 OOD provides a web-native experience for HPC.
@@ -196,6 +200,7 @@ We describe our motivating use-case for these application routers in the Experim
 the advantage here is that we can use this same front end regardless of where a physical cluster may actually be located
 openstack gives us cloud-native tooling and sdn to route traffic to desired destinations -->
 
+(sdhpc-cicd)=
 ## CICD Pipelines
 
 <!--- that should really about working from a defined image and customizing it via the user-data section to connet it to the runtime environment.
@@ -315,7 +320,7 @@ This is how it's deployed
 - show construction of cicd pipelines and how the produce their artifacts
 -->
 
-
+(sdhpc-applied)=
 # SDHPC for Data and Cluster Migration
 
 ```{figure} images/AB_cluster.png
@@ -403,6 +408,7 @@ this does acheive our ability to fluidly move people and projects
 conclusion can note the side effect is more autonomy of science engagement which is helping drive our goal for end-user managed infrastructure.
 -->
 
+(conclusion)=
 # Conclusion
 
 Infrastructure as code demands programmatic control over infrastructure.
