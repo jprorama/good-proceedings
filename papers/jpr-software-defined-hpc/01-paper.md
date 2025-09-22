@@ -19,13 +19,10 @@ authors:
     affiliations:
       - University of Alabama at Birmingham, Research Computing
 abstract: |
-  We introduce a software defined infrastructure for high performance 
-  computing (SDHPC) that includes
-  SSH and web application routers for user-based connection routing to endpoints based on individual user identities. We detail Continuous Integration
-  and Continuous Deployment (CICD) pipelines used
-  to build and deploy an infrastructure of application proxies that route user connections to appropriate login and Open OnDemand nodes based on their group membership.
-  We demonstrate the utility of this infrastructure to our motivating use case of
-  limiting user downtime during maintenance operations.
+  We introduce a Software Defined Infrastructure for High Performance Computing.
+  SDHPC includes SSH and web application routers for user-based connection routing to endpoints based on individual user identities.
+  We detail Continuous Integration and Continuous Deployment pipelines used to build and deploy an infrastructure of application proxies that route user connections to appropriate login and Open OnDemand nodes based on their group membership.
+  We demonstrate the utility of this infrastructure to our motivating use case of limiting user downtime during maintenance operations.
   We conclude with observations on functionality and highlight future directions.
 
 keywords:
@@ -37,25 +34,27 @@ keywords:
   - AI Infrastructure
 ---
 
-
+(introduction)=
 # Introduction
 
-Research computing has long focused on providing access to High Performance Computing (HPC) clusters.
-The traditional HPC user experience centered around access to a command line shell where all system interaction is managed using a text-based user interface.
-A user creates a secure connection with SSH to a cluster login node.
-From there the user submits batch jobs to a scheduler, conducts workflows, and organizes their data.
-Many attempts have been to enhanced the user experience with web-based tooling to reduce learning curves and create a more immersive browser-based user experience.
-In this space, Open OnDemand has emerged as the most successful web integration for HPC @Hudak2018.
-Over the past decade, Open OnDemnd (OOD) has come to dominate the HPC landscape as the de facto web experience and can now be seen as a fundamental component of any HPC cluster.
-OOD has elevated HPC to a web-native experience and shaped user expectations for HPC to align with the self-directed experiences of cloud-native applications.
+Research computing support initiatives have long focused on providing access to High Performance Computing (HPC) clusters.
+The traditional HPC user experience centers around access to a command line shell where all system interaction is managed via a text-based user interface.
+A user creates a secure connection to a cluster login node with the SSH protocol @Lonvick2006.
+From there the user submits batch jobs to a scheduler, conducts workflows, and organizes their data using commands entered at the shell prompt.
+Many attempts have been to enhanced the user experience with web-based tooling to create a more immersive browser-based user experience and reduce the learning curve for the command shell.
+Open OnDemand (OOD) has emerged as the most successful web integration for HPC @Hudak2018.
+Over the past decade, OOD has become a de facto web interface for HPC and is now considered a fundamental component of any HPC cluster.
+OOD has elevated HPC to a web-native experience and shaped user expectations for HPC services to align with the self-directed experience common across cloud-native applications.
 
-OOD's success stems not from displacing the traditional command shell but by enhancing the user experience to include web-native applications that sit naturally along-side traditional user interaction with the cluster.
+OOD's success stems not from displacing the traditional command shell but by enhancing the user experience to include web-native applications that sit naturally along-side traditional command line user interaction with the cluster.
 A basic deployment provides access to Juptyer notebooks, R-Studio, and a browser-based VNC desktop capable of presenting any traditional GUI application, like Matlab or QGIS, within the browser.
-All of these web-based applications are easily launched as jobs on cluster compute nodes through simple button clicks in the web browser.
+All of these web-based applications are easily launched as jobs on cluster compute nodes through simple button clicks using the web browser.
 
-The key aspect of the OOD architecture is transparent mapping of browser actions to per-user web servers that run applications under the native cluster identity of the user.
-This allows all actions performed by the user on the cluster, whether via the web or the command shell, to run in the context of their account and adhere to a consistent security model enforced by the operating system across the cluster.
-Users can only access cluster resources as dictated by their account permissions.
+The key enabler of the OOD architecture is the transparent mapping of browser interaction to per-user web servers that run applications under the native cluster identity of the user.
+This ensures all actions performed by the user on the cluster, whether via the web or the command shell, run in the context of the user's account.
+Processes running under the user's account inherently adhere to a consistent security model enforced by the operating system across the cluster.
+User processes can only access cluster resources as dictated by their account permissions.
+This ensures the web interactions are native to the cluster and do not follow a separate security model that must be mapped to the underlying hardware, as is common in many web applications.
 
 <!--- ref gridsphere and science gateways that were dedicated tools and that tarun or something that we looked at around 2017 -->
 
@@ -64,12 +63,12 @@ These services introduce capabilities for horizontal scalability and enable us t
 The front-end services act as application proxies that route SSH and web connections to appropriate login and OOD nodes based on a user's group membership.
 This capability implies that the application routers authenticate users in order to resolve routing rules.
 We built a simple Apache-based proxy that manages web single sign-on for users and routes them to their target OOD instance.
-We extended sshpiper, an open-source SSH router built on top of Go ssh, to include group-based user routing @Lian2025. 
+We extended sshpiper, an open-source SSH proxy built on top of the Golang ssh package, to include group-based user routing @Lian2025.
 <!--- we should show a picture of this here? -->
 
-Operating cloud-native infrastructure at-scale is improved with development processes that leverage continuous integration and continuous deployment (CICD) methodologies [Ugwueze2024].
+Operating cloud-native infrastructure at-scale is improved with development processes that leverage continuous integration and continuous deployment (CICD) methodologies @Ugwueze2024.
 To that end, we created a GitLab CI/CD workflow to build and deploy our application routing front-end nodes and the Open On Demand web services @gitlab-cicd.
-This workflow ensures that we can deliver features and fix bugs through regular deployments of this software-defined infrastructure.
+This workflow ensures that we can deliver features and fix bugs through regular deployments of the SDHPC infrastructure.
 
 In the next section we highlight trends in the design of large-scale systems in industry and research that are driving evolution toward cloud-native HPC infrastructure.
 In section [sec-tag] we document the design of our software-defined infrastructure to route user connections to desired endpoints and the CICD workflow used to deploy it.
@@ -107,7 +106,7 @@ We adopted this paradigm to organize our research computing infrastructure.
 # Software Defined HPC
 
 HPC clusters have long aligned with the principles of software defined infrastructure.
-The original Beowulf cluster model deployed fleets of identical compute nodes under the control of a head node that also supplied the core infrastructure for HPC operations.
+The original Beowulf cluster model deployed fleets of identical compute nodes under the control of a head node that also supplied the core infrastructure for HPC operations @Reed2014.
 Today's IT infrastructure leverages these same approaches to provide scalable compute, storage, and network capacity.
 
 
