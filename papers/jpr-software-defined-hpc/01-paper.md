@@ -41,20 +41,21 @@ keywords:
 # Introduction
 
 Research computing has long focused on providing access to High Performance Computing (HPC) clusters.
-The traditional HPC user experience has centered around access to a command line where all system interaction is managed..
-Users SSH to a cluster login node from where the user submits batch jobs to a scheduler, conducts workflows, and organizes their data.
+The traditional HPC user experience centered around access to a command line shell where all system interaction is managed using a text-based user interface.
+A user creates a secure connection with SSH to a cluster login node.
+From there the user submits batch jobs to a scheduler, conducts workflows, and organizes their data.
 Many attempts have been to enhanced the user experience with web-based tooling to reduce learning curves and create a more immersive browser-based user experience.
-In this space, Open OnDemand has emerged as the most successful web integration for HPC.
+In this space, Open OnDemand has emerged as the most successful web integration for HPC @Hudak2018.
 Over the past decade, Open OnDemnd (OOD) has come to dominate the HPC landscape as the de facto web experience and can now be seen as a fundamental component of any HPC cluster.
-OOD has elevated HPC to a web-native experience and shaped user expectation for HPC to align with the self-directed experiences of cloud-native applications.
+OOD has elevated HPC to a web-native experience and shaped user expectations for HPC to align with the self-directed experiences of cloud-native applications.
 
-OOD's success stems not from displacing the traditional command shell but by enhancing the user experience to include web-native applications that sit naturally along-side their traditional cluster interaction.
+OOD's success stems not from displacing the traditional command shell but by enhancing the user experience to include web-native applications that sit naturally along-side traditional user interaction with the cluster.
 A basic deployment provides access to Juptyer notebooks, R-Studio, and a browser-based VNC desktop capable of presenting any traditional GUI application, like Matlab or QGIS, within the browser.
 All of these web-based applications are easily launched as jobs on cluster compute nodes through simple button clicks in the web browser.
 
 The key aspect of the OOD architecture is transparent mapping of browser actions to per-user web servers that run applications under the native cluster identity of the user.
 This allows all actions performed by the user on the cluster, whether via the web or the command shell, to run in the context of their account and adhere to a consistent security model enforced by the operating system across the cluster.
-User's can only access cluster resources as dictated by their account permissions.
+Users can only access cluster resources as dictated by their account permissions.
 
 <!--- ref gridsphere and science gateways that were dedicated tools and that tarun or something that we looked at around 2017 -->
 
@@ -62,12 +63,12 @@ In order to facilitate operation of campus HPC as a cloud-native application, we
 These services introduce capabilities for horizontal scalability and enable us to affect changes in the environment on minimal subsets of the user community.
 The front-end services act as application proxies that route SSH and web connections to appropriate login and OOD nodes based on a user's group membership.
 This capability implies that the application routers authenticate users in order to resolve routing rules.
-We built a simple Apache-based proxy that manages web single sign-on for users an routes them to their target OOD instance.
-We extended ssh.piper, an open-source SSH router built on top of Go ssh, to include group-based user routing. 
+We built a simple Apache-based proxy that manages web single sign-on for users and routes them to their target OOD instance.
+We extended sshpiper, an open-source SSH router built on top of Go ssh, to include group-based user routing @Lian2025. 
 <!--- we should show a picture of this here? -->
 
-Operating cloud-native infrastructure at-scale is improved with development processes that leverage continuous integration and continuous deployment (CICD) methodologies.
-To that end, we created a GitLab CI/CD workflow to build and deploy our application routing front-end nodes and the Open On Demand web services.
+Operating cloud-native infrastructure at-scale is improved with development processes that leverage continuous integration and continuous deployment (CICD) methodologies [Ugwueze2024].
+To that end, we created a GitLab CI/CD workflow to build and deploy our application routing front-end nodes and the Open On Demand web services @gitlab-cicd.
 This workflow ensures that we can deliver features and fix bugs through regular deployments of this software-defined infrastructure.
 
 In the next section we highlight trends in the design of large-scale systems in industry and research that are driving evolution toward cloud-native HPC infrastructure.
@@ -77,30 +78,30 @@ We conclude the paper with a discussion of future directions.
 
 # Related Work
 
-Research generates data that must be processed, analyzed, and stored in order to derive scientific insight.
+Research generates data that must be processed, analyzed, and stored in order to derive scientific insights.
 Information Technology (IT) infrastructure is fundamental to the creation of research applications that process data.
 Access to infrastructure determines the success or failure of research workflows that depend on computing.
-Cloud computing increases access to infrastructure by provide software defined abstractions for the compute, storage, and network resources needed to build applications.
-OpenStack is an Open Source Software (OSS) platform that allows a site to encapsulate its physical IT hardware and present cloud-native abstractions for compute, storage, and network resources via software defined infrastructure.
+Cloud computing increases access to infrastructure by providing software defined abstractions for the compute, storage, and network resources needed to build applications.
+OpenStack is an Open Source Software (OSS) platform that allows a site to encapsulate its physical IT hardware and present cloud-native abstractions for compute, storage, and network resources via software defined infrastructure @openstack2025.
 This allows platform users to access software defined IT infrastructure to build applications using cloud-native development paradigms.
 IT staff can guard access to the physical systems running OpenStack to ensure secure operations while democratizing access to resource abstractions that enable developers to build applications.
 Deploying OpenStack to provide infrastructure for research applications provides autonomy for IT operations and research software development.
 
-The NSF-funded Jetstream2 project is an at-scale cloud computing environment available to researchers through the NSF ACCESS program.
-The NFS ACCESS program is the successor to the XSEDE program which nurtured the development of national HPC resources to support research workflows.
+The NSF-funded Jetstream2 project is an at-scale cloud computing environment available to researchers through the NSF ACCESS program [@Hancock2021; @Boerner2023].
+The NFS ACCESS program is the successor to the XSEDE program which nurtured the development of national HPC resources to support research workflows @Towns2014.
 Jetstream2 is built using OpenStack to provide cloud-native abstract research applications that need compute, storage, and network resources.
 Jetstream2 allocates capacity for CPU, GPU, and storage using ACCESS-granted service unit credits.
 Jetstream2 demonstrates at-scale operations of OpenStack clouds and provides autonomous access to advanced hardware for the development of research workflows.
 
-CRI\_XCBC is legacy software project created by the XSEDE program as working example of deployable and extensible HPC stack that used Ansible playbooks to deploy and OpenHPC defined infrastructure.
+CRI\_XCBC is legacy software project created by the XSEDE program as working example of deployable and extensible HPC stack that used Ansible playbooks to deploy and OpenHPC defined infrastructure @CRIXCBC2024.
 We maintain a site-specific fork of CRI\_XCBC to as our foundation for software defined cluster environments.
-We extended this code-base to include OOD web services as part of the Ansible-deployed OpenHPC cluster. @Tripathi2020
+We extended this code-base to include OOD web services as part of the Ansible-deployed OpenHPC cluster @Tripathi2020.
 We further extend this Ansible code-base in this work.
 
-Data center as a computer is a warehouse scale computing paradigm that treats the data center a massive computer.
+Data center as a computer is a warehouse scale computing paradigm that treats the data center a massive computer @Barroso2019.
 While not all computing systems are warehouse scale, the paradigm facilitates systems development by demonstrating how computer system abstractions can simplify the organization of complex multi-site and multi-system infrastructure deployments.
-Using these abstractions allows operators, administrators, and users of the system to communicate and strategize on specific functions or services without risking a loss of interoperability.
-Such layered abstractions have been crucial to the success of global network initiatives.
+Using these abstractions allows systems operators, cybersecurity specialist, business administrators, and end users to communicate and strategize on specific functions and services without risking a loss of system design integrity and component interoperability.
+Layered and functional abstractions have been crucial to the success of complex multi-domain systems.
 We adopted this paradigm to organize our research computing infrastructure.
 
 # Software Defined HPC
@@ -326,13 +327,13 @@ This is how it's deployed
 An arrangement of the Software Defined HPC (SDHPC) framework to route users to distinct cluster environments based on their user identity and group membership. Group A web and ssh connections are routed to Cluster A and group B connections are routed to Cluster B.
 ```
 
-The Software Defined HPC (SDHPC)_framework provides features that enable a variety of service development and operations workflows.
-We introduced SDHPC to maintain front-end application routers for our traditional campus HPC user interfaces to support a multi-phase migration of data and infrastructure in our RCS.
+The Software Defined HPC (SDHPC) framework provides features that enable a variety of service development and operations workflows.
+We introduced SDHPC to maintain front-end application routers for our existing campus HPC user interfaces to support a multi-phase migration of data and infrastructure in our RCS.
 The framework was developed in response to a confluence of events.
-We were faced with vendor relationship changes, product licensing changes, product lifecycle transitions, data center power constraints, storage demand growth, and budgetary constraints.
+We were faced with vendor relationship changes, product licensing changes, product lifecycle transitions, data center power constraints, storage demand growth, and the financial constraint of annual budget cycles [@carlz-at-us.ibm.com2020; @Sedlmayer2020].
 The GPFS-based, high-performance storage tier for the campus HPC system needed to move to the latest supported version.
 Due to evolution in the vendor landscape, this necessitated moving petabytes of existing data to new hardware from a new vendor.
-Power constraints in the on-campus data center drove decisions to consolidate HPC CPU resources alongside other RCS compute resources in newly available high-powered racks at a nearby commercial data center already hosting our HPC GPU resources and the cloud and container components of RCS.
+Power constraints in the on-campus data center drove decisions to consolidate HPC CPU resources alongside other RCS compute resources in newly available high-powered racks at a nearby commercial data center already hosting our HPC GPU resources and the cloud and container components of RCS. @DcbloxHDcolo
 The new facilities provided sufficient power to support anticipated growth of our compute capacity across RCS.
 This consolidation would also return HPC operations to a single Infiniband segment serving all HPC compute resources with access to the updated GPFS platform, which includes an NVMe performance tier to support I/O throughput demands for emerging AI workloads.
 The compute node consolidate freed on-campus data center space to allow expansion of the capacity tier storage provided by Ceph.
