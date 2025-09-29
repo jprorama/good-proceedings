@@ -1,0 +1,4 @@
+name: mystmd
+dependencies:
+  - conda-forge::mystmd=1.6.1
+  - conda-forge::sphinxcontrib-mermaid=1.0.0
