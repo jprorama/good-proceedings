@@ -22,9 +22,11 @@ abstract: |
   Software defined infrastructure for high-performance computing (SDHPC) can reduce user impacts during maintenance operations.
   In our implementation, the complete system of users and resources was divided into two logical groups.
   Based on group membership, users are exposed to only the resources associated with their group.
-  An infrastructure of application proxies, deployed by coninuous integration and continuous deployment (CI/CD) pipelines, routes users to the appropriate gateways.
+  An infrastructure of application routers, deployed by continuous integration and continuous deployment (CI/CD) pipelines, route users to the appropriate gateways.
 
-    We demonstrate the utility of this infrastructure to our motivating use case of limiting user downtime during maintenance operations. We conclude with observations on functionality and highlight future directions.
+  We demonstrate the utility of this infrastructure to our motivating use case of limiting user downtime during maintenance operations. We conclude with observations on functionality and highlight future directions.
+
+  Infrastructure has given us so much flexibility that...
 
 keywords:
   - High Performance Computing
@@ -33,61 +35,73 @@ keywords:
   - CICD
   - Cloud
   - AI Infrastructure
-
-myst:
-  enable_extensions: ["attrs_block"]
-  fence_as_directive: ["mermaid"]
 ---
 
 
 # Introduction
 
-**NEEDS** a first paragraph that summarizes the entire paper, with a hook. We take too long getting to the point.
+The dream of scientific discovery drives the computing needs of researchers.
+Advances in research computing technology arise in response to those needs.
+Researchers must remain competitive in a rapidly-changing policy landscape.
+So, research computing staff must quickly adapt systems to changing needs and improving technology, while minimizing impact to researcher operations.
+Traditional high-performance computing (HPC) infrastructure is defined by its rigid hardware layout.
+In contrast, software defined infrastructure for high-performance computing (SDHPC) is responsive and flexible, enabling in-flight hardware upgrades with reduced researcher impact.
 
-Research computing has long focused on providing access to High Performance Computing (HPC) clusters.
-The traditional HPC user experience centered around text-based, command-line shell interactions.
-Users accessed the login node using SSH and, from there, submit batch jobs to a scheduler, conduct workflows, and organize data.
-Attempts at web-based, immersive user experiences realized varying levels of acceptance and success.
-Among these, Open OnDemand (OOD) emerged as the most successful web integration for HPC @Hudak2018.
-Over the past decade, Open OnDemand grew to dominate the HPC landscape, becoming the de facto HPC web experience and a fundamental component of many HPC clusters.
-OOD elevated HPC interaction to a web-native experience and shaped user expectations to align with the self-directed experiences of cloud-native applications.
+Traditional HPC use centered around text-based, command-line shell interactions where users would SSH to login nodes and engage in research computing activities.
+The development of immersive web interfaces to HPC systems provided a friendlier user experience, increasing access.
+Among these interfaces, Open OnDemand (OOD) emerged as the most successful @Hudak2018.
+Now a fundamental component of many HPC systems, OOD brought user expectations for HPC systems in alignment with the self-directed experience of cloud-native applications.
 
-OOD's success stems not from displacing the traditional command shell but by enhancing the user experience to include web-native applications that sit naturally along-side traditional user interaction with the cluster.
-A basic deployment provides access to Juptyer notebooks, R-Studio, and a browser-based VNC desktop capable of presenting any traditional GUI application, like Matlab or QGIS, within the browser.
-All of these web-based applications are easily launched as jobs on cluster compute nodes through simple button clicks in the web browser.
+OOD owes its success to a reduction of cognitive load for researchers.
+Alongside a traditional command-line shell, the reference deployment of OOD provides access to several interactive, web-native applications.
+Jupyter Notebooks, R Studio, and a VNC desktop capable of presenting native, windowed applications, are all available behind a simple resource request form.
+Researchers start by engaging with their HPC system through these familiar applications and, when they are ready, migrate to batch tools at the shell.
+Implementation details, such as submitting a job script to the scheduler, are hidden behind the software-defined abstractions of the resource request form and application definition.
+Because OOD hides these details, researchers can more readily envision HPC enabling their work.
 
-The key aspect of the OOD architecture is transparent mapping of browser actions to per-user web servers that run applications under the native cluster identity of the user.
-This allows all actions performed by the user on the cluster, whether via the web or the command shell, to run in the context of their account and adhere to a consistent security model enforced by the operating system across the cluster.
-Users can only access cluster resources as dictated by their account permissions.
-It is this model of identity-based resource access control we emulate for our implementation of SDHPC.
+OOD operates by mapping browser interactions to per-user web servers.
+When a user first connects, the central OOD server spawns a web server process running under their identity, as defined on the HPC system, and hands off the connection.
+Whenever the user launches an application, any processes started by their web server fall under that user's identity context.
+The net effect is that user engagement with the HPC system is shepherded by software definitions—identity, operating system rules, OOD application definitions, and the scheduler.
+
+NOTE: OOD solved a problem that let us do the thing. The "wart" in the OOD solution is the traditional SSH access. This is one of the problems we solved.
+
+NOTE: On the IT side... OOD provides an improvement to application interface management. Our work augments this by providing an improvement to user access management.
 
 <!--- ref gridsphere and science gateways that were dedicated tools and that tarun or something that we looked at around 2017 -->
 
-In order to facilitate operation of campus HPC as a cloud-native application, we built front-end services to manage connection routing for SSH and web endpoints.
-These services introduce capabilities for horizontal scalability and enable us to affect changes in the environment on minimal subsets of the user community.
-The front-end services act as application proxies that route SSH and web connections to appropriate login and OOD nodes based on a user's group membership.
-This capability implies that the application routers authenticate users in order to resolve routing rules.
-We built a simple Apache-based proxy that manages web single sign-on for users and routes them to their target OOD instance.
-We extended sshpiper, an open-source SSH router built on top of Go ssh, to include group-based user routing @Lian2025.
+Whereas OOD transforms HPC into a web-native application, our implementation of SDHPC transformed the UAB campus HPC system (Cheaha) into a cloud-native application.
+Application proxies enable us to modify the HPC environment for arbitrary subset groups of the user community.
+Correct group-based routing requires proxies to authenticate users for both SSH and web connections.
+Web authentication and routing is handled by a web single sign-on (SSO) Apache service.
+To handle SSH authentication and routing, we extended sshpiper, an open-source SSH router built on top of the Golang SSH package @Lian2025.
+
 <!--- we should show a picture of this here? -->
 
-Operating cloud-native infrastructure at-scale is improved with development processes that leverage continuous integration and continuous deployment (CICD) methodologies [Ugwueze2024].
-To that end, we created a GitLab CI/CD workflow to build and deploy our application routing front-end nodes and the Open On Demand web services @gitlab-cicd.
-This workflow ensures that we can deliver features and fix bugs through regular deployments of this software-defined infrastructure.
+The application proxies introduce an opportunity for horizontal scalability because SDHPC behaves like a cloud-native infrastructure.
+Continuous integration and continuous deployment (CICD) methodologies enable greater scaling of cloud-native infrastructures [Ugwueze2024].
+To leverage the opportunity, we created a GitLab CI/CD workflow to build and deploy our application proxies and OOD web services @gitlab-cicd.
+Our SDHPC CI/CD workflow ensures we can deliver features and bug fixes through regular, reproducible, version-controlled deployments.
+
+NOTE: Built cloud-native infra for interface to HPC system/env. These things, working together, make SDHPC a possibility.
+
+- Extend sshpiper
+- Gitlab CI/CD
+  - Core infra
+  - HPC services
+
+**NEEDS** segue paragraph, tie to first PP.
 
 # Related Work
 
 **NEEDS** a paragraph with an overview of the section.
 
 <!-- establishing value of OpenStack -->
-Research generates data that must be processed, analyzed, and stored in order to derive scientific insights.
-Information Technology (IT) infrastructure is fundamental to the creation of research applications that process data.
-Access to infrastructure determines the success or failure of research workflows that depend on computing.
-Cloud computing increases access to infrastructure by providing software defined abstractions for the compute, storage, and network resources needed to build applications.
-OpenStack is an Open Source Software (OSS) platform that allows a site to encapsulate its physical IT hardware and present cloud-native abstractions for compute, storage, and network resources via software defined infrastructure @openstack2025.
-This allows platform users to access software defined IT infrastructure to build applications using cloud-native development paradigms.
-IT staff can guard access to the physical systems running OpenStack to ensure secure operations while democratizing access to resource abstractions that enable developers to build applications.
-Deploying OpenStack to provide infrastructure for research applications provides autonomy for IT operations and research software development.
+The success of research computing activities depends on access to information technology (IT) infrastructure: compute, storage, and networking.
+OpenStack, an open source software (OSS) Cloud computing platform, provides software defined abstractions over that infrastructure @openstack2025.
+NOTE: User access to OpenStack/VM infra are not common in RC systems.
+NOTE: Decoupling hardware from the abstractions presented to the researcher is the central idea enabling SDHPC.
+IT staff secure the physical systems, and researchers are empowered to build cloud-native applications from the software defined abstractions.
 
 <!-- things what use openstack -->
 The NSF-funded Jetstream2 project is an at-scale cloud computing environment available to researchers through the NSF ACCESS program [@Hancock2021; @Boerner2023].
@@ -96,22 +110,28 @@ Jetstream2 is built using OpenStack to provide cloud-native abstract research ap
 Jetstream2 allocates capacity for CPU, GPU, and storage using ACCESS-granted service unit credits.
 Jetstream2 demonstrates at-scale operations of OpenStack clouds and provides autonomous access to advanced hardware for the development of research workflows.
 
-CRI\_XCBC is legacy software project created by the XSEDE program as working example of deployable and extensible HPC stack that used Ansible playbooks to deploy and OpenHPC defined infrastructure @CRIXCBC2024.
+CRI\_XCBC is a legacy software project created by the XSEDE program.
+It provides a working example of a deployable, extensible HPC stack that used Ansible playbooks to deploy and OpenHPC defined infrastructure @CRIXCBC2024.
 We maintain a site-specific fork of CRI\_XCBC to as our foundation for software defined cluster environments.
 We extended this code-base to include OOD web services as part of the Ansible-deployed OpenHPC cluster @Tripathi2020.
 We further extend this Ansible code-base in this work.
 
-Data center as a computer is a warehouse scale computing paradigm that treats the data center a massive computer @Barroso2019.
-While not all computing systems are warehouse scale, the paradigm facilitates systems development by demonstrating how computer system abstractions can simplify the organization of complex multi-site and multi-system infrastructure deployments.
-Using these abstractions allows systems operators, cybersecurity specialist, business administrators, and end users to communicate and strategize on specific functions and services without risking a loss of system design integrity and component interoperability.
-Layered and functional abstractions have been crucial to the success of complex multi-domain systems.
-We adopted this paradigm to organize our research computing infrastructure.
+The "data center as a computer" model facilitates systems development, abstracting each subsystem as the component in a personal computer @Barroso2019.
+Compute resources, both HPC and cloud, form the central processing unit (CPU).
+Compute-adjacent storage, such as block devices and parallel network file storage, is system memory.
+Object storage is hard drives, and the internal networks are mainboard traces and cables.
+These abstractions guide organization of multi-site and multi-system infrastructure deployments.
+Additionally, the model is easier to reason about, improving stakeholder communication and strategizing.
 
 # Software Defined HPC
+
+We adopted data center as computer. We refer to it as RCS. We use this model/framework as a target for SDHPC (controlling user engagement to underlying physical infra).
 
 HPC clusters have long aligned with the principles of software defined infrastructure.
 The original Beowulf cluster model deployed fleets of identical compute nodes under the control of a head node that also supplied the core infrastructure for HPC operations.
 Today's IT infrastructure leverages these same approaches to provide scalable compute, storage, and network capacity.
+
+- Bring in CI/CD?
 
 **NEEDS** a paragraph overview of what comes next.
 Need a transition from this intro blurb to the next part.
@@ -121,6 +141,8 @@ Need a transition from this intro blurb to the next part.
 <!--Building a cloud native experience. -->
 In order to align our campus research computing infrastructure with scalable, cloud-native solutions, we adopted the data-center-as-the-computer model to create a coherent platform delivering compute, storage, and networking to research applications.
 We identify this platform as a Research Computing System (RCS), see [Fig. %s](#rcs_architecture).
+
+NOTE: Ask IT Comms about reworking the RCS as computer image into clean vector form.
 
 <!--
 if we have time lets remake this figure to be publication-ready
@@ -240,6 +262,8 @@ We describe the build pipeline in the next subsection and the deploy pipeline in
 
 ### Core Infrastructure Builds
 
+**Next 3 PP** can be squished into one efficient PP.
+
 We build OOD VM images that include all dependencies of it's software stack and additional components for integration with our local HPC systems architecture.
 The images are constructed using the legacy CRI\_XCBC Anisble repository.
 CRI\_XCBC project was created under the NSF XSEDE initiative to provide an infrastructure-as-code (IaC) framework for HPC deployments.
@@ -261,6 +285,8 @@ We now rely on stand-alone Heat-based deployment of dev clusters built using Bri
 We use this cluster management infrastructure on our production cluster.
 This move was necessary to support construction of BCM-specific drivers for our RabbitMQ based account creation services.
 
+**Stop squishing**
+
 A dedicated image factory repository uses GitLab CI/CD to construct the OOD and account application images by ingesting external Ansible rules from our CRI\_XCBC fork.
 The Ansible framework is executed during the Packer image build.
 The images are stored in the OpenStack Glance image repository and made available to developer and production projects.
@@ -270,7 +296,7 @@ Long delays between builds can otherwise lead to unexpected failures when it bec
 The daily build also supports deployment of the development head to review feature improvements against our production HPC system.
 We use this approach to enable the introduction of new OOD applications through the addition of an app-specific Ansible role in our CRI\_XCBC repo.
 
-<!--- following may not be necessary
+<!-- following may not be necessary
 While still rooted in CRI_XCBC, OOD and the Account app have become the only components we build out of this IaC framework.
 We run the OOD build and deploy pipelines each day in order to maintain confidence in our ability to construct a complex VM image with many dependencies.
 We use the daily builds of OOD as the foundation for multiple deployments.
@@ -388,6 +414,10 @@ We chose to retain a physical login node for Cluster B to avoid performance scal
 The cloud-based application routers and OOD instance have access all necessary cluster services via the cluster provider network.
 We use NFS to share the storage namespace with the SSH application router and OOD VM, as opposed to native GPFS clients as is the case with physical nodes connected to respective InfiniBand fabrics of the cluster environment.
 The storage workloads for sshpiper routing and OOD interaction are relatively light and have not presented performance issues using NFS.
+
+**Consider** including sshpiper data we gathered to build our confidence in our methodology somewhere in here. No need for long discussion, no need for graphs, merely some numbers and text as an additional point of interest. Want to indicate we are sensitive to performance concerns.
+
+**Also** The full OOD pipeline build runs in 20 minutes, and deployment runs in 3-5 minutes. The rapid deployment means we can get more testing done, enhancing quality.
 
 The cloud hosting environment is also a natural fit for CICD driven development and production workflows.
 A self-hosted GitLab instance provides CICD tooling to develop and deploy the SDHPC into production using a dedicated hpc-factory project.
