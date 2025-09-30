@@ -1,5 +1,7 @@
 ---
-numbering: true
+numbering:
+  headings: true
+  headings_1: false
 title: Software Defined HPC with Open OnDemand
 exports:
   - format: pdf
@@ -173,7 +175,8 @@ At our site, the HPC cluster is deployed using Bright Cluster Manager.
 Compute nodes connect to a GPFS parallel file system via a dedicated Infiniband network.
 
 RCS positions the HPC infrastructure along-side platforms that provide VM and container abstractions to applications.
-The VM compute capacity is implemented via an on-premise OpenStack cloud which provides a comprehensive software defined infrastructure enabling direct control over compute, storage and network resources needed to build and operate research applications.
+The VM compute capacity is implemented via an on-premise OpenStack-based cloud.
+This provides a comprehensive software defined infrastructure enabling the direct control over compute, storage and network resources needed to build and operate applications.
 We use this infrastructure to host the application routers, OOD web application, and CICD workflows describe the in following subsections.
 Container compute capacity for RCS is implemented via Kubernetes.
 Today, SDHPC exclusively uses the VM and batch subsystems.
@@ -230,7 +233,7 @@ Only users with an account in good\_standing are allowed to interact with the HP
 Other states direct user connections to the account app so they can address any requirements to reestablish their good\_standing state.
 The account\_hold state provides explicit control to support personal over individual user access to HPC resources for service events or other user engagements.
 
-The application routers and account states combine to fully-manage user interaction with the HPC services provided by RCS.
+The application routers and account states combine to fully control user interaction with the HPC services provided by RCS.
 The HPC system is only available to authorized users and the HTTPS and SSH application routers ensure connections are only estabilished with the endpoints that can provide services to specific users.
 
 <!--- so we can actually say we have the openstack as a front end to our hpc
@@ -252,22 +255,24 @@ this is doen via user-data and direct openstack cli
 this infrastructure relies on gitlab runner for packer and other deploy tasks
 -->
 
-With the creation of SSH and HTTP application routers, we are able to direct user traffic flows to login nodes, OOD, and the account app according to site operational goals.
-This supports creating a coherent user experience for HPC access that is consistent across both HTTP and SSH endpoints.
+SSH and HTTP application routers direct user traffic to login nodes, OOD instances, and the account app according to site operational goals.
+This creates a coherent user experience for HPC access that is consistent across both HTTP and SSH endpoints.
 Implementing these routers as software defined infrastructure (SDI) allows continuous development of platform features and control over the introduction of capabilities as they are deployed.
 
-Our CICD workflows are built using GitLab CI/CD.
-We use a dedicated GitLab repository to house the CICD pipelines, following an image factory pattern.
-We created CICD pipelines with separate build and deploy phases based on the requirements of specific use-cases.
+Our CICD workflows are built using GitLab CI/CD @gitlab-cicd.
+We use a dedicated GitLab repository to house the CICD pipelines, following the image factory pattern @Muse2023.
+We created CICD pipelines with separate build and deploy phases.
 Both phases leverage Ansible to construct relevant artifacts.
 The RCS cloud subsystem provides the infrastructure for development, build, and deployment workflows.
-Using an on-premise cloud enables the construction of comprehensive cloud-native workflows and allows tight integration with campus HPC resources.
-Packer templates are used to construct VM images for OOD and account app components.
-We choose to directly invoke OpenStack CLI commands during deployment as a convenient optimization.
-We have used Terraform for the deploy phase of other system components not featured in this work.
-The separation of build and deploy steps enables us to construct versioned OOD VM binaries that can be used across development, test, and production environments.
-The deploy steps focus on customization that meet the needs of the specific environments, providing late binding hooks and other customization for specific clusters.
-We describe the build pipeline in the next subsection and the deploy pipeline in the following.
+This enables the construction of comprehensive cloud-native workflows and facilates tight integration with campus HPC resources via direct connection to relavent provider networks.
+
+Packer templates are used to construct VM images for the proxies, OOD and account app during the build phase.
+These templates include extensions to interface with the OpenStack API and can readily work with other cloud providers.
+We choose to directly invoke OpenStack CLI commands during the deployment phase as a convenient optimization.
+We have used Terraform for the deploy phase of other system components not featured in this work and plan to migrate SDHPC artifact deployment to Terraform in the future.
+
+The separation of build and deploy steps enables us to construct versioned VM binaries that can be used across development, test, and production environments.
+The deploy steps focus on customizations that meet the needs of the specific environments, providing late binding hooks and other customization for specific dev, test, and production clusters.
 
 ### Core Infrastructure Builds
 
