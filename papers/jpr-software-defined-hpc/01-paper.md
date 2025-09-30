@@ -19,6 +19,9 @@ authors:
   - name: Krish Moodbidri
     affiliations:
       - University of Alabama at Birmingham, Research Computing
+  - name: William Warriner
+    affiliations:
+      - University of Alabama at Birmingham, Research Computing
 abstract: |
   Software defined infrastructure for high-performance computing (SDHPC) can reduce user impacts during maintenance operations.
   In our implementation, the complete system of users and resources was divided into two logical groups.
