@@ -67,7 +67,7 @@ OOD operates by mapping browser interactions to per-user web servers.
 When a user connects to the HPC system via HTTPS, the OOD server spawns a web server process running under their account identity, as defined on the HPC system.
 Whenever the user launches an application, processes started by their web server run within this identity context.
 The net effect is that user engagement with the HPC system is shepherded by software definitions—identity, operating system rules, OOD application definitions, and the scheduler.
-User interaction via OOD is governed by the same permissions enforced by operating system on all the user's processes, whether started by OOD or via a traditional command-line accessed via SSH.
+User interaction via OOD is governed by the same permissions enforced by operating system on all the user's processes, whether started via OOD or via a traditional command-line accessed via SSH.
 
 NOTE: OOD solved a problem that let us do the thing. The "wart" in the OOD solution is the traditional SSH access. This is one of the problems we solved.
 
@@ -188,53 +188,50 @@ Enhancements to RCS network interfacing are under consideration to expand servic
 (sdhpc-app-router)=
 ## Application Routers
 
-OOD provides a web-native experience for HPC.
-In order to operate the full HPC stack under this model, it is necessary to have control over all aspect of user interaction with the HPC platform.
-This includes the traditional, secure shell (SSH) interfaces to the system.
-While OOD does provide a web-based solutions for secure shell access via web ssh, many users depend on traditional SSH clients that directly connect to port 22 using the SSH protocol.
-In order to provide a unified experience with the HPC platform to all users, it desirable to manage SSH connections with infrastructure components that share the same functionality of HTTP service.
-In particular, HTTP connections are readily routed to nodes that provide specific services to the user.
-For example, while OOD is delivered as an integrated single-system solution, it is composed of standard web application components that route authenticated user connections to their own dedicated web server that provides access to HPC resources.
+OOD elevates HPC to web-native experience.
+Our goal with SDHPC is to elevate HPC to a cloud-native experience.
+To achieve this goal it is necessary to have full control over all aspects of user interaction with the HPC platform.
+Routing users to appropriate services based on their identity is key to ensuring a consistent exprience.
+We built application routers for HTTPS and SSH connections.
+The routers can direct user connections to specific endpoints based on user identity and account status.
 
-If a user has no corresponding HPC account, OOD can be configured to direct the connection to an endpoint designed to handle this scenario.
-Many environments, provide a destination service that enables user account creation.
-We implemented an Account web application that allows users with a defined institutional relationship to create their own HPC account.
-The account app prompts the user to create the account.
-After the user submits the request, the account app interacts with standard HPC system services, exposed as RabbitMQ services, to create the user account.
-Once the account is created the user connection is redirected to OOD, this time passing the account check and passing through to their per-user nginx server where they can interact with the OOD services.
+Routing HTTPS connections is standard fare for Web-native applications.
+We built a dedicated front-end HTTPS application router that directs users to an OOD instance based on their group membership.
+The HTTPS router acts as a reverse proxy that authenticates the user via web SSO and routes their connection to the appropriate endpoint.
+Our HTTPS router requirements were readily satisfied with standard Apache reverse-proxy and web SSO features.
+We leverage user account attributes to make the routing decision.
+
+Routing SSH connections is less common.
+In addition, routing SSH connections based on user identity introduces special considerations.
+The user identity is not confirmed until the SSH connection is terminated and the session is authenticated.
+Once this SSH session active, it ordinarily results in a login shell on the endpoint which terminated the connection, implicitly preventing further routing.
+To accomplish rule-based SSH routing based on user identity, we implemented an SSH application router using sshpiper, a reverse proxy for SSH built on Golang's SSH library @Lian2025.
+We contributed an enhancement to sshpiper that allows a user's group membership to be use in the routing rules.
+
+The SSH application router enables user connection routing to preferred login nodes based on site policy or other operational requirements.
+The sshpiper routing works by terminating the client-side SSH connection and establishing a secondary internal SSH connection to the desired login node endpoint.
+For password-based authentication, the users credentials are passed to and validated by the login node endpoint.
+For key-based authentication, the user authentication is managed using internal cluster keys shared via the file system.
+This uses the same infrastructure already in place on the HPC system.
+HPC systems will typically allow users to transparently access compute nodes running their jobs without prompting for additional authentication.
+This is done by creating an SSH keypair at account creation and automitically adding it to the user's authorized-keys file.
+We use this existing HPC infrastructure to facilate sshpiper operations.
+
+In order to align with the self-directed nature of cloud-native platforms, we previously built an account app that allows authorized users to create their HPC account.
+User's without HPC accounts are redirected to the account app.
+The account app prompts the user to create their account or instructs them that they are not authorized for this resource.
+After an authorized user submits their account request, the account app interacts with standard HPC account creation services, exposed via a RabbitMQ message bus.
+Once the account is created the user's web connection is redirected to OOD allowing the user to begin their HPC on-boarding.
 The self-directed account creation request typically takes less than fifteen seconds to complete.
 This capability ensures authorized users experience little more than a slight account provisioning delay the first time the access the HPC system.
 
-Because user authorization is a standard part of OOD access, the user can also be redirected to their account services page as needed to support HPC operations.
-We define simple states like good\_standing, certification\_required, and account\_hold to facilitate operations.
-Only users with accounts in good\_standing are allowed to interact with OOD.
-Other states force the user's web connections to the account app so they address any requirements to reestablish their good\_standing state.
-The account\_hold state provides direct control to support personal over individual user access to HPC resources for service events or other user engagements.
+We define a basic set of account states like good\_standing, certification\_required, and account\_hold to facilitate operations.
+Only users with an account in good\_standing are allowed to interact with the HPC system via OOD or SSH.
+Other states direct user connections to the account app so they can address any requirements to reestablish their good\_standing state.
+The account\_hold state provides explicit control to support personal over individual user access to HPC resources for service events or other user engagements.
 
-This request routing is standard fare for web-native application.
-It enables the creation of rich user experiences that can be consistently implemented across the platform.
-We have further enhanced OOD's implicit account behavior by introducing a dedicated front-end HTTP application router that can control web user access based on additional attributes like group membership.
-Just like OOD, this application router requires authenticated connections.
-Once authenticated via web SSO, the full spectrum of user account attributes can be used to route connections based on state, group membership, or individual identity according to site policies.
-We add dedicated reverse proxy stanzas to the router in order to control the destination.
-This enhanced web connection routing enables the creation of rich user experiences that align with site service delivery goals.
-Because HTTP routing is long established and the requirements for our enhancements are easily satisfied with standard Apache web server features.
-
-HPC is, however, not an exclusively web-based experience.
-The SSH protocol is the dominate user interface to HPC.
-In order to provide a consistent user experience across HTTP and SSH endpoints, it is desirable for both services to respond similarly to site policies based on a users account status.
-For example, a user whose account is in a hold state should be notified to access the account app via their web browser and prevent from further SSH interaction with the site.
-We have accomplished this with Group Match stanzas in our OpenSSH server configuration.
-More sophisticated routing of valid SSH connections is not possible.
-To accomplish rule-based routing based on user attributes, we implemented an SSH application router using sshpiper, a reverse proxy for SSH built on Golang's SSH library.
-We contributed an enhancement to sshpiper that allows a user's group membership to be use in the routing rules. <!-- was it accepted? -->
-This SSH application router enables user connection routing to preferred login nodes based on site policy or operational requirements.
-The sshpiper routing works by terminating the client-side SSH connection and establishing a second internal connection to the desired login node endpoint.
-For password-based authentication, the users credentials are passed to and validated by the login node endpoint.
-For key-based authentication, the user authentication is managed using internal cluster keys shared via the file system.
-This uses the same infrastructure already in place on the HPC system that allows users to transparently access compute nodes running their jobs without prompting for additional authentication.
-
-We describe our motivating use-case for these application routers in the Experiment section.
+The application routers and account states combine to fully-manage user interaction with the HPC services provided by RCS.
+The HPC system is only available to authorized users and the HTTPS and SSH application routers ensure connections are only estabilished with the endpoints that can provide services to specific users.
 
 <!--- so we can actually say we have the openstack as a front end to our hpc
 the advantage here is that we can use this same front end regardless of where a physical cluster may actually be located
