@@ -85,7 +85,7 @@ To handle SSH authentication and routing, we contributed an extension to sshpipe
 <!--- we should show a picture of this here? -->
 
 The application routers introduce an opportunity for horizontal scalability, further enabling SDHPC to deliver cloud-native infrastructure.
-Continuous integration and continuous deployment (CICD) methodologies enable greater scaling of cloud-native infrastructures [Ugwueze2024].
+Continuous integration and continuous deployment (CICD) methodologies enable greater scaling of cloud-native infrastructures @Ugwueze2024.
 To leverage the opportunity, we created a GitLab CI/CD workflow to build and deploy our application routers and OOD web services @gitlab-cicd.
 Our SDHPC CICD workflow ensures we can deliver features and bug fixes through regular, reproducible, version-controlled deployments.
 
@@ -133,16 +133,15 @@ Additionally, the model is easier to reason about, improving stakeholder communi
 (sdhpc)=
 # Software Defined HPC
 
-We adopted data center as computer. We refer to it as RCS. We use this model/framework as a target for SDHPC (controlling user engagement to underlying physical infra).
+HPC clusters have long aligned with the principles of software defined infrastructure  @Reed2014.
+The original Beowulf model deployed fleets of identical commodity compute nodes under the control of a head node that also supplied core infrastructure for HPC operations @Becker1999.
+Cloud infrastructure leverages these same approaches to provide scalable compute, storage, and network capacity @Lenk2009.
 
-HPC clusters have long aligned with the principles of software defined infrastructure.
-The original Beowulf cluster model deployed fleets of identical compute nodes under the control of a head node that also supplied the core infrastructure for HPC operations @Reed2014.
-Today's IT infrastructure leverages these same approaches to provide scalable compute, storage, and network capacity.
-
-- Bring in CI/CD?
-
-**NEEDS** a paragraph overview of what comes next.
-Need a transition from this intro blurb to the next part.
+We adopted data center as computer to align our research computing infrastructure with a coherent system architecture.
+The resulting platform serves as a target for SDHPC operations.
+Application routers direct user connections to physical HPC systems infrastructure.
+We follow Agile methodologies to facilitate development and management of the SDHPC services @Shore2021.
+CICD pipelines build and deploy the application routers and OOD services enabling release engineering for SDHPC.
 
 (sdhpc-rcs)=
 ## Research Computing System
