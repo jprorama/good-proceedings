@@ -44,29 +44,30 @@ keywords:
 (introduction)=
 # Introduction
 
-The dream of scientific discovery drives the computing needs of researchers.
+The promise of scientific discovery drives the computing needs of researchers.
 Advances in research computing technology arise in response to those needs.
-Researchers must remain competitive in a rapidly-changing policy landscape.
-So, research computing staff must quickly adapt systems to changing needs and improving technology, while minimizing impact to researcher operations.
-Traditional high-performance computing (HPC) infrastructure is defined by its rigid hardware layout.
-In contrast, software defined infrastructure for high-performance computing (SDHPC) is responsive and flexible, enabling in-flight hardware upgrades with reduced researcher impact.
+Researchers must adapt to a rapidly-changing competative landscape.
+As such, research computing staff must quickly adapt systems to changing needs and improving technology, while minimizing impact to researcher operations.
+Traditional high-performance computing (HPC) infrastructure is defined by fixed hardware layouts.
+In contrast, a software defined infrastructure for high-performance computing (SDHPC) is responsive and flexible, enabling in-flight upgrades with reduced researcher impact.
 
-Traditional HPC use centered around text-based, command-line shell interactions where users would SSH to login nodes and engage in research computing activities @Lonvick2006.
+Traditional HPC use centered on text-based, command-line  interactions where users connect via SSH to dedicated login nodes to engage with research workflows @Lonvick2006.
 The development of immersive web interfaces to HPC systems provided a friendlier user experience, increasing access.
 Among these interfaces, Open OnDemand (OOD) emerged as the most successful @Hudak2018.
 Now a fundamental component of many HPC systems, OOD brought user expectations for HPC systems in alignment with the self-directed experience of cloud-native applications.
 
 OOD owes its success to a reduction of cognitive load for researchers.
-Alongside a traditional command-line shell, the reference deployment of OOD provides access to several interactive, web-native applications.
+The reference deployment of OOD provides access to several interactive, web-native applications.
 Jupyter Notebooks, R Studio, and a VNC desktop capable of presenting native, windowed applications, are all available behind a simple resource request form.
-Researchers start by engaging with their HPC system through these familiar applications and, when they are ready, migrate to batch tools at the shell.
+Researchers start by engaging with their HPC system via the browser using familiar web applications and, when they are ready, can migrate to batch tools at the command-line as needed.
 Implementation details, such as submitting a job script to the scheduler, are hidden behind the software-defined abstractions of the resource request form and application definition.
 Because OOD hides these details, researchers can more readily envision HPC enabling their work.
 
 OOD operates by mapping browser interactions to per-user web servers.
-When a user first connects, the central OOD server spawns a web server process running under their identity, as defined on the HPC system, and hands off the connection.
-Whenever the user launches an application, any processes started by their web server fall under that user's identity context.
+When a user connects to the HPC system via HTTPS, the OOD server spawns a web server process running under their account identity, as defined on the HPC system.
+Whenever the user launches an application, processes started by their web server run within this identity context.
 The net effect is that user engagement with the HPC system is shepherded by software definitions—identity, operating system rules, OOD application definitions, and the scheduler.
+User interaction via OOD is governed by the same permissions enforced by operating system on all the user's processes, whether started by OOD or via a traditional command-line accessed via SSH.
 
 NOTE: OOD solved a problem that let us do the thing. The "wart" in the OOD solution is the traditional SSH access. This is one of the problems we solved.
 
@@ -74,18 +75,19 @@ NOTE: On the IT side... OOD provides an improvement to application interface man
 
 <!--- ref gridsphere and science gateways that were dedicated tools and that tarun or something that we looked at around 2017 -->
 
-Whereas OOD transforms HPC into a web-native application, our implementation of SDHPC transformed the UAB campus HPC system (Cheaha) into a cloud-native application.
-Application proxies enable us to modify the HPC environment for arbitrary subset groups of the user community.
-Correct group-based routing requires proxies to authenticate users for both SSH and web connections.
-Web authentication and routing is handled by a web single sign-on (SSO) Apache service.
-To handle SSH authentication and routing, we extended sshpiper, an open-source SSH router built on top of the Golang SSH package @Lian2025.
+OOD transforms HPC into a web-native user experience.
+SDHPC transforms the HPC system into a cloud-native application.
+Application routers for SSH and HTTPS enable us to modify the HPC environment for arbitrary subsets of the user community.
+Identity-based routing requires the application routers to authenticate users in order to direct their connections to the correct resources.
+Web authentication is handled by a web single sign-on (SSO) enabled Apache reverse-proxy that can route users based on group membership.
+To handle SSH authentication and routing, we contributed an extension to sshpiper, an open-source SSH proxy built on top of the Golang SSH package, that enables routing based on group membership  @Lian2025.
 
 <!--- we should show a picture of this here? -->
 
-The application proxies introduce an opportunity for horizontal scalability because SDHPC behaves like a cloud-native infrastructure.
+The application routers introduce an opportunity for horizontal scalability, further enabling SDHPC to deliver cloud-native infrastructure.
 Continuous integration and continuous deployment (CICD) methodologies enable greater scaling of cloud-native infrastructures [Ugwueze2024].
-To leverage the opportunity, we created a GitLab CI/CD workflow to build and deploy our application proxies and OOD web services @gitlab-cicd.
-Our SDHPC CI/CD workflow ensures we can deliver features and bug fixes through regular, reproducible, version-controlled deployments.
+To leverage the opportunity, we created a GitLab CI/CD workflow to build and deploy our application routers and OOD web services @gitlab-cicd.
+Our SDHPC CICD workflow ensures we can deliver features and bug fixes through regular, reproducible, version-controlled deployments.
 
 NOTE: Built cloud-native infra for interface to HPC system/env. These things, working together, make SDHPC a possibility.
 
