@@ -268,12 +268,17 @@ This enables the construction of comprehensive cloud-native workflows and facila
 
 Packer templates are used to construct VM images for the proxies, OOD and account app during the build phase.
 These templates include extensions to interface with the OpenStack API and can readily work with other cloud providers.
-We choose to directly invoke OpenStack CLI commands during the deployment phase as a convenient optimization.
+We execute daily builds of our OOD image.
+This ensures image construction remains viable and surfaces problems with build dependencies in a timely fashion.
+The daily builds also support developement deploys to review feature improvements against our production HPC system.
+
+For the deployment pipelines, we choose to directly invoke OpenStack CLI commands for implementation convenience.
 We have used Terraform for the deploy phase of other system components not featured in this work and plan to migrate SDHPC artifact deployment to Terraform in the future.
 
 The separation of build and deploy steps enables us to construct versioned VM binaries that can be used across development, test, and production environments.
-The deploy steps focus on customizations that meet the needs of the specific environments, providing late binding hooks and other customization for specific dev, test, and production clusters.
+The deploy steps focus on customizations that meet the needs of specific environments, providing late-binding hooks and other customizations for dev, test, and prod clusters.
 
+<!---
 ### Core Infrastructure Builds
 
 **Next 3 PP** can be squished into one efficient PP.
@@ -310,16 +315,19 @@ Long delays between builds can otherwise lead to unexpected failures when it bec
 The daily build also supports deployment of the development head to review feature improvements against our production HPC system.
 We use this approach to enable the introduction of new OOD applications through the addition of an app-specific Ansible role in our CRI\_XCBC repo.
 
+-->
 <!-- following may not be necessary
 While still rooted in CRI_XCBC, OOD and the Account app have become the only components we build out of this IaC framework.
 We run the OOD build and deploy pipelines each day in order to maintain confidence in our ability to construct a complex VM image with many dependencies.
 We use the daily builds of OOD as the foundation for multiple deployments.
 We provide live deployment of the current development head to allow feature and bug fixes to be explored.
 -->
-
+<!---
 ### Deployment of HPC Services
+-->
 <!---  this is the interface for modern hpc + globus, we do not address globus routing in this work. -->
 
+<!--
 We created deploy pipelines for the HTTP and SSH application routers and the OOD and account application web applications.
 The application routers are built from stock OS images, currently Alama9, that are customized during deploy with Ansible rules to include the HTTP and SSH servers configured to authenticate the user and then route to the correct backend service.
 We deploy the HTTP and SSH on services to separate VMs for ease of construction and to facilitate service scaling if needed.
@@ -353,12 +361,13 @@ We use a blue-green deployment model where the node for a service is deployed us
 Operation of the newly deployed node is validated in the blue state.
 If the service is operating as expected, the services public IP address is moved to the newly deploy node.
 This simplifies our migration to newly deployed services and avoids service interruption because the software define network service of the cloud platform provide a clean transition for traffic flows.
-
+-->
+<!---
 There are many ways to handle this deployment cut of over.
 Our current approach use manual IP address cutover after accept test are performed.
 More advanced deploy pipelines could include automatic validation modeled after test-driven development.
 These automated build and deploy of our CICD pipelines help ensure we can reliably and continuously release the latest improvements to the user experience.
-
+-->
 <!---
 This is how it's deployed
 
