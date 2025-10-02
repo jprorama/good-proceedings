@@ -71,12 +71,6 @@ Whenever the user executes actions on the web site, processes started by the web
 The net effect is that user engagement with the HPC system is shepherded by software definitions—identity, operating system rules, OOD application definitions, and the scheduler.
 User interaction via OOD is governed by the same permissions enforced by the operating system on all the user's processes, whether started via OOD or via a traditional command-line accessed via SSH.
 
-NOTE: OOD solved a problem that let us do the thing. The "wart" in the OOD solution is the traditional SSH access. This is one of the problems we solved.
-
-NOTE: On the IT side... OOD provides an improvement to application interface management. Our work augments this by providing an improvement to user access management.
-
-<!--- ref gridsphere and science gateways that were dedicated tools and that tarun or something that we looked at around 2017 -->
-
 OOD transforms HPC into a web-native user experience.
 SDHPC transforms the HPC system into a cloud-native application.
 Application routers for SSH and HTTPS enable us to modify the HPC environment for arbitrary subsets of the user community.
@@ -84,33 +78,25 @@ Identity-based routing requires the application routers to authenticate users in
 Web authentication is handled by a web single sign-on (SSO) enabled Apache reverse-proxy that can route users based on group membership.
 To handle SSH authentication and routing, we contributed an extension to sshpiper, an open-source SSH proxy built on top of the Golang SSH package, that enables routing based on group membership  @Lian2025.
 
-<!--- we should show a picture of this here? -->
-
 The application routers introduce an opportunity for horizontal scalability, further enabling SDHPC to deliver cloud-native infrastructure.
 Continuous integration and continuous deployment (CICD) methodologies enable greater scaling of cloud-native infrastructures @Ugwueze2024.
 To leverage the opportunity, we created a GitLab CI/CD workflow to build and deploy our application routers and OOD web services @gitlab-cicd.
 Our SDHPC CICD workflow ensures we can deliver features and bug fixes through regular, reproducible, version-controlled deployments.
 
-NOTE: Built cloud-native infra for interface to HPC system/env. These things, working together, make SDHPC a possibility.
-
-- Extend sshpiper
-- Gitlab CI/CD
-  - Core infra
-  - HPC services
-
-**NEEDS** segue paragraph, tie to first PP.
+In this work we introduce SDHPC, a cloud-native infrastructure for managing interaction with HPC clusters.
+The work builds on the web-native HPC experience provided by OOD by adding consistent application routing for both HTTP and SSH user connections to the HPC cluster.
+We contributed enhancements to sshpiper that allow connection routing decisions to be based user group memberships.
+We developed CICD pipelines to build application routers for HTTP and SSH connections to HPC.
+SDHPC is an Infrastructure as Code framework that enables the operation of cloud-native HPC services.
 
 (related-work)=
 # Related Work
 
-**NEEDS** a paragraph with an overview of the section.
-
 <!-- establishing value of OpenStack -->
 The success of research computing activities depends on access to information technology (IT) infrastructure: compute, storage, and networking.
-OpenStack, an open source software (OSS) Cloud computing platform, provides software defined abstractions over that infrastructure @openstack2025.
-NOTE: User access to OpenStack/VM infra are not common in RC systems.
-NOTE: Decoupling hardware from the abstractions presented to the researcher is the central idea enabling SDHPC.
-IT staff secure the physical systems, and researchers are empowered to build cloud-native applications from the software defined abstractions.
+OpenStack, an open source cloud computing platform, provides software defined control over infrastructure @openstack2025.
+IT staff can guard access to the physical systems running OpenStack to ensure secure operations while democratizing access to resource abstractions that enable developers to build applications.
+Deploying OpenStack for research infrastructure decouples IT operations and research software development.
 
 <!-- things what use openstack -->
 The NSF-funded Jetstream2 project is an at-scale cloud computing environment available to researchers through the NSF ACCESS program [@Hancock2021; @Boerner2023].
