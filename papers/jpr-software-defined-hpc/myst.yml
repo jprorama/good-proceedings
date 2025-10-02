@@ -27,6 +27,8 @@ project:
         - Fowler2010
         - Humble2013
         - Ramos2015
+        - Robinson2025
+        - uabrc2025
     - rule: citation-is-unique
 site:
   template: article-theme

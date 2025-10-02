@@ -107,7 +107,7 @@ Jetstream2 demonstrates at-scale operations of OpenStack clouds and provides aut
 
 CRI\_XCBC is a legacy software project created by the XSEDE program.
 It provides a working example of a deployable, extensible HPC stack that used Ansible playbooks to deploy and OpenHPC defined infrastructure @CRIXCBC2024.
-We maintain a site-specific fork of CRI\_XCBC to as our foundation for software defined cluster environments.
+We maintain a site-specific fork of CRI\_XCBC to as our foundation for software defined cluster environments @Robinson2025.
 We extended this code-base to include OOD web services as part of the Ansible-deployed OpenHPC cluster @Tripathi2020.
 We further extend this Ansible code-base in this work.
 
@@ -233,7 +233,7 @@ Our CICD workflows are built using GitLab CI/CD @gitlab-cicd.
 We use a dedicated GitLab repository to house the CICD pipelines, following the image factory pattern @Muse2023.
 We created CICD pipelines with separate build and deploy phases.
 Both phases leverage Ansible to construct relevant artifacts.
-The RCS cloud subsystem provides the infrastructure for development, build, and deployment workflows.
+The RCS cloud subsystem provides the infrastructure for development, build, and deployment workflows @uabrc2025.
 This enables the construction of comprehensive cloud-native workflows and facilates tight integration with campus HPC resources via direct connection to relavent provider networks.
 
 Packer templates are used to construct VM images for the proxies, OOD and account app during the build phase.
