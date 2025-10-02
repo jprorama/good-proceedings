@@ -236,24 +236,8 @@ The account\_hold state provides explicit control to support personal over indiv
 The application routers and account states combine to fully control user interaction with the HPC services provided by RCS.
 The HPC system is only available to authorized users and the HTTPS and SSH application routers ensure connections are only estabilished with the endpoints that can provide services to specific users.
 
-<!--- so we can actually say we have the openstack as a front end to our hpc
-the advantage here is that we can use this same front end regardless of where a physical cluster may actually be located
-openstack gives us cloud-native tooling and sdn to route traffic to desired destinations -->
-
 (sdhpc-cicd)=
 ## CICD Pipelines
-
-<!--- that should really about working from a defined image and customizing it via the user-data section to connet it to the runtime environment.
-
-this is really where a picture could come in handy
-we build images via packer with possible external repo
-
-we build deploys from defined images
-add hooks for late binding to target env
-this is doen via user-data and direct openstack cli
-
-this infrastructure relies on gitlab runner for packer and other deploy tasks
--->
 
 SSH and HTTP application routers direct user traffic to login nodes, OOD instances, and the account app according to site operational goals.
 This creates a coherent user experience for HPC access that is consistent across both HTTP and SSH endpoints.
@@ -277,103 +261,6 @@ We have used Terraform for the deploy phase of other system components not featu
 
 The separation of build and deploy steps enables us to construct versioned VM binaries that can be used across development, test, and production environments.
 The deploy steps focus on customizations that meet the needs of specific environments, providing late-binding hooks for dev, test, and prod clusters.
-
-<!---
-### Core Infrastructure Builds
-
-**Next 3 PP** can be squished into one efficient PP.
-
-We build OOD VM images that include all dependencies of it's software stack and additional components for integration with our local HPC systems architecture.
-The images are constructed using the legacy CRI\_XCBC Anisble repository.
-CRI\_XCBC project was created under the NSF XSEDE initiative to provide an infrastructure-as-code (IaC) framework for HPC deployments.
-
-We adopted CRI\_XCBC to provide developer instantiated HPC platforms to implement our original OOD deployment.
-OOD is challenging for early career developers to learn, test, and extend without an HPC cluster with which it integrates.
-In order to write systems applications, developers must be granted complete authority over the software stack that includes the HPC system stack, batch scheduler, and other core platform services.
-DevOps workflows are easier to construct when development and production infrastructure are isolated from each other.
-Developers need to be able to iterate repeatedly over the build and deploy pipelines.
-Providing developer access to production resources is undesirable and works against the goal of creating repeatable builds and deployments.
-Deploying disposable HPC clusters (dev clusters) as part of the development workflow aids construction of SDI and professional growth.
-
-We forked and extended CRI\_XCBC to include Ansible roles to build an OOD image.
-Constructing OOD within the CRI\_XCBC framework provided an HPC platform with which OOD integrates.
-This also provided the necessary components to develop our web-based Account app that enables self-service HPC onboarding for users.
-The account app provides a web UI that invokes native HPC account creation services via a RabbitMQ message bus.
-Over time we abandoned use of the OpenHPC IaC elements from the CRI_XCBC framework.
-We now rely on stand-alone Heat-based deployment of dev clusters built using Bright Cluster Manager (BCM) and the NVIDIA (formerly Bright Computing) Easy8 developer-focused cluster framework.
-We use this cluster management infrastructure on our production cluster.
-This move was necessary to support construction of BCM-specific drivers for our RabbitMQ based account creation services.
-
-**Stop squishing**
-
-A dedicated image factory repository uses GitLab CI/CD to construct the OOD and account application images by ingesting external Ansible rules from our CRI\_XCBC fork.
-The Ansible framework is executed during the Packer image build.
-The images are stored in the OpenStack Glance image repository and made available to developer and production projects.
-This approach ensures we can track and test the latest changes to the IaC repositories and provide versioned images for development and production use.
-To that end, we execute a daily build of our OOD image to ensure the construction remains viable and surfaces problems with build dependencies in a timely fashion.
-Long delays between builds can otherwise lead to unexpected failures when it becomes necessary to update configurations in response to bugs or changes in operation.
-The daily build also supports deployment of the development head to review feature improvements against our production HPC system.
-We use this approach to enable the introduction of new OOD applications through the addition of an app-specific Ansible role in our CRI\_XCBC repo.
-
--->
-<!-- following may not be necessary
-While still rooted in CRI_XCBC, OOD and the Account app have become the only components we build out of this IaC framework.
-We run the OOD build and deploy pipelines each day in order to maintain confidence in our ability to construct a complex VM image with many dependencies.
-We use the daily builds of OOD as the foundation for multiple deployments.
-We provide live deployment of the current development head to allow feature and bug fixes to be explored.
--->
-<!---
-### Deployment of HPC Services
--->
-<!---  this is the interface for modern hpc + globus, we do not address globus routing in this work. -->
-
-<!--
-We created deploy pipelines for the HTTP and SSH application routers and the OOD and account application web applications.
-The application routers are built from stock OS images, currently Alama9, that are customized during deploy with Ansible rules to include the HTTP and SSH servers configured to authenticate the user and then route to the correct backend service.
-We deploy the HTTP and SSH on services to separate VMs for ease of construction and to facilitate service scaling if needed.
-The HTTP application router is a standard Apache reverse proxy that includes SAML-based WebSSO using Shibboleth service provider components.
-Once the user identity is know, an LDAP lookup against the HPC cluster's account database to gather group memberships.
-We use membership in specific groups to choose the target OOD backend.
-
-The SSH application router is built using sshpiper, a Golang SSH proxy server implemented on the Golang SSH library.
-The sshpiper server is built from source with Ansible during deploy.
-Additional Ansible tasks are used to configure the host to integrate with the HPC cluster system environment.
-The key parts of this configuration include system level user account integration to support user account validation for the SSH protocol.
-User home directories to be mounted via NFS to support standard user-level ssh configuration, e.g. ordinary management of the authorized_keys files for key-based authentication.
-The SSH application router operates much like the familiar login node on any cluster with the exception that all SSH connections are passed through the application router.
-No user shells are run on the application router.
-The SSH router transparently establishes a second ssh connection to the internal termination point for the desired login node, where the user shell is started.
-All user SSH based user interaction with the cluster will occur from the login node that hosts the shell process.
-
-We deploy the OOD and account apps from the VM image created during the build phase described above.
-Using pre-built VM images for OOD results in shorted deploy time.
-We use the concept of late-binding to the customize the deployed image with the configuration required to interface with a specific cluster environment.
-An OOD node has cluster integration expectations similar to login nodes.\
-We characterize the late binding as interfacing the node with the clusters name resolution (DNS), account lookup (LDAP), file namespace (NFS), and batch job submission (Slurm).
-The Ansible coded deploy steps adjust the pre-built image to interface with these necessary cluster services.
-
-In all cases, we initiate the Ansible deploy steps during node instantiating using cloud-init user-data scripts.
-These scripts are injected into the node by the cloud platform and executed on the node during instance startup.
-The deploy pipelines directly execute commands that generate the user data script which is then passed to the invoked openstack CLI commands that instantiate the node.
-After the node is instantiated, the pipeline assigns public floating IP address for external and cluster-internal networks to enable the node to accept user connections and interact with cluster services.
-
-We use a blue-green deployment model where the node for a service is deployed using a non-production endpoint address.
-Operation of the newly deployed node is validated in the blue state.
-If the service is operating as expected, the services public IP address is moved to the newly deploy node.
-This simplifies our migration to newly deployed services and avoids service interruption because the software define network service of the cloud platform provide a clean transition for traffic flows.
--->
-<!---
-There are many ways to handle this deployment cut of over.
-Our current approach use manual IP address cutover after accept test are performed.
-More advanced deploy pipelines could include automatic validation modeled after test-driven development.
-These automated build and deploy of our CICD pipelines help ensure we can reliably and continuously release the latest improvements to the user experience.
--->
-<!---
-This is how it's deployed
-
-- the app routers are built directly in gitlab ci as artificts contstructed directly on the openstack cloud infrastructure
-- show construction of cicd pipelines and how the produce their artifacts
--->
 
 (sdhpc-applied)=
 # SDHPC for Data and Cluster Migration
