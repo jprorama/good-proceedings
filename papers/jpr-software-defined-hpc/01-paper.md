@@ -381,90 +381,80 @@ This is how it's deployed
 ```{figure} images/AB_cluster.png
 :label: ab_cluster
 :width: 100%
-:alt: Software Defined HPC framework used to manage a two cluster deployment where a single visible entry point leads to two different cluster fabrics, transparent to the user experience.
+:alt: Schematic showing boxes representing the application routers for HTTP and SSH with lines pointing to additional boxes that represent the login and OOD nodes of distinct clusters A and B.
 
-An arrangement of the Software Defined HPC (SDHPC) framework to route users to distinct cluster environments based on their user identity and group membership. Group A web and ssh connections are routed to Cluster A and group B connections are routed to Cluster B.
+An arrangement of the Software Defined HPC (SDHPC) framework to route users to distinct cluster environments based on their user identity and group membership. Group A web and ssh connections are routed to the login and OOD nodes of Cluster A and group B connections are routed to the logig and OOD nodes of Cluster B.
 ```
 
-The Software Defined HPC (SDHPC) framework provides features that enable a variety of service development and operations workflows.
-We introduced SDHPC to maintain front-end application routers for our existing campus HPC user interfaces to support a multi-phase migration of data and infrastructure in our RCS.
-The framework was developed in response to a confluence of events.
-We were faced with vendor relationship changes, product licensing changes, product lifecycle transitions, data center power constraints, storage demand growth, and the financial constraint of annual budget cycles [@carlz-at-us.ibm.com2020; @Sedlmayer2020].
-The GPFS-based, high-performance storage tier for the campus HPC system needed to move to the latest supported version.
-Due to evolution in the vendor landscape, this necessitated moving petabytes of existing data to new hardware from a new vendor.
-Power constraints in the on-campus data center drove decisions to consolidate HPC CPU resources alongside other RCS compute resources in newly available high-powered racks at a nearby commercial data center already hosting our HPC GPU resources and the cloud and container components of RCS. @DcbloxHDcolo
-The new facilities provided sufficient power to support anticipated growth of our compute capacity across RCS.
-This consolidation would also return HPC operations to a single Infiniband segment serving all HPC compute resources with access to the updated GPFS platform, which includes an NVMe performance tier to support I/O throughput demands for emerging AI workloads.
-The compute node consolidate freed on-campus data center space to allow expansion of the capacity tier storage provided by Ceph.
-This growth was designed to leverage annual operating budgets through multi-year infrastructure improvement cycles.
-The approach allowed us to maximize GPFS performance for HPC applications and maximize storage capacity for large data sets a unified namespace by leveraging policy-based tiering of infrequently used data to a more granular, lower cost storage platform powered by Ceph.
+The SDHPC framework provides features that enable a variety of operational and service development scenarios.
+We introduced SDHPC to maintain stable HTTP and SSH endpoint definitions for users during a multi-phase migration of HPC services in our RCS.
 
-The SDHPC framework supports balancing competing priorities.
-[Figure %s](#ab_cluster) shows our initial use-case to migrate the HPC user community from the original GPFS storage platform to the new, tiered solution.
-Implementing the storage migration required reconstructing the RCS HPC subsystem in new data center facilities.
-In order to avoid extended downtime for the entire HPC community to accommodate data movement and system relocation, we created an initial footprint of HPC nodes as a separate cluster attached to the new GPFS platform.
-We designate Cluster A in the figure as the HPC resource associate with the original storage platform  and Cluster B as the HPC resources associate with the new storage platform.
-This approach facilitated incremental movement of user and HPC capacity as data and data center migrations completed.
-It also provided a load testing ramp for the new tiered storage solution.
+The SDHPC framework was developed in response to a confluence of events.
+We were faced with vendor relationship changes, product licensing changes, product lifecycle transitions, data center power constraints, storage demand growth, and the general financial constraint of operating within annual budget cycles [@carlz-at-us.ibm.com2020; @Sedlmayer2020].
 
-We were able to move subsets of the user community by designating users accounts as members of group A or group B to direct their connections to cluster A or cluster B, respectfully, depending on the location of account data.
-These assignments are transparent to the end user.
-The SSH and HTTP endpoints remain the same for all users regardless of their assigned cluster.
-SSH and HTTP application connections are routed to the appropriate nodes.
-The file system namespace is consistent across storage systems using bind mounts in each cluster.
-The job submission experience remains the same.
-Resource scheduling is modified using the SLURM job submit plugin to route user jobs to compute nodes connected to the storage platform housing their data.
-The same group name mechanism used by front-end application routers modified submitted jobs to tag them with a feature to select appropriate nodes within a partition.
+The GPFS high-performance storage for the HPC service needed to move to the latest supported version.
+This required moving petabytes of data to a new GPFS implementation from a new vendor.
+The new GPFS implementation tiers inactive files to a capacity tier implmented with Cephfs. 
+This cost-effective design provides a unified file namespace for HPC applications, maximizes GPFS performance for active analyses, and maximizes capacity to retain data.
 
-Keeping the user experience consistent during this transition minimizes the cognitive load on users by avoiding changes to HPC workflows.
-User connections are routed to the cluster with the new storage system when their data migration is complete.
-All user data is seeded to the new storage system with regular synchronization runs using dsync from mpiFileUtils.
-When the user's migration from Cluster A to Cluster B is scheduled, their account is place on hold to avoid changes to their data.
+Power constraints in the on-campus data center drove decisions to consolidate all RCS compute resources, including the HPC compute and associated GPFS performance tier, in newly available high-powered racks at a nearby commercial data center @DcbloxHDcolo.
+The facility provides sufficient power for planned growth of RCS compute capacity.
+The facility is integrated with the on-campus data center using dark fiber provided by the University of Alabama System Regional Optical Network (UASRON).
+This configuration allows the on campus data center to continue hosting RCS Ceph storage and the peering points for campus and R&D network.
+
+The SDHPC framework helps navigate complex requirements.
+[Figure %s](#ab_cluster) highlights the HPC storage and data center migration use-case that drove its development.
+Implementing the migration required reconstructing the HPC service in the new data center facility.
+In order to avoid extended downtimes for the entire HPC community, we planned the migration around moving isolated subsets of users in batches.
+We staged an initial footprint of HPC compute capacity as a separate cluster attached to the new GPFS platform in the new facility.
+
+We designate Cluster A in #fig:ab_cluster as the HPC resources associate with the original storage platform and Cluster B as the HPC resources associate with the new storage platform.
+This provides distinct environments onto which users can be mapped depending on their migration status.
+This approach allowes moving users and HPC capacity as their data migrations are completed.
+The incremental migration also provided a natural load-testing ramp for the new storage solution.
+
+The SDHPC HTTP and SSH application routers provide stable endpoints for all users, regardless of their migration status.
+Moving a user is accomplished by designating their accounts as a member of group A or group B.
+This group membership directs their connections to cluster A or cluster B, respectfully, depending on the location of account data.
+The assignments are transparent to the end user.
+
+To further simplify the user experience, we provide the same file system namespace and scheduler partitions in both cluster environments.
+The file system namespace is made consistent by using apporpriate bind mounts.
+The job submission experience is made consistent by using the SLURM job submit plugin to route user jobs to teh correct cluster compute nodes that are connected to the storage platform housing their data.
+The same group memberships are use to modify submitted jobs, tagging them with a feature to select appropriate nodes within a requested partition.
+
+Keeping the user experience consistent during this transition minimizes the cognitive load on users by avoiding changes to their HPC workflows.
+The migration workflow seeds user data to the new storage system with regular synchronization runs using dsync from mpiFileUtils @osti_mpifileutils.
+When a user's migration from Cluster A to Cluster B is scheduled, their account is place on hold to avoid changes to their data.
 A final sync from the source system is performed to capture any changes since the most recent seed point.
-Their file namespace is stubbed into the new GPFS front end from the Cephfs capacity tier.
+Their file namespace is stubbed into the new GPFS performance tier from the Cephfs capacity tier.
 Their cluster assignment group is updated and their account hold is released.
-From then on their connections are routed to the Cluster B.
-From the user perspective, each migrated user effectively experiences a blue-green deployment model.
-They are cut over to the new production system when it is validated as operational for their account.
+From then on their group B membership ensures their HTTP and SSH connections are routed to Cluster B.
+Each migrated user effectively experiences a blue-green deployment model [@Fowler2010; @Humble2013].
+The user is cut over to the new production system when it is validated as operational for their account.
 
-The cloud services of the RCS platform provide an ideal hosting environment for this infrastructure.
-The comprehensive software defined infrastructure provided by OpenStack enables the creation of cloud-native development and operations workflows.
-We provisioned the components for application routing and cluster B's OOD node in an OpenStack project dedicated to HPC operations.
-The project is authorized to access campus and cluster provider networks made accessible through OpenStack SDN services.
-This allows the services to accept user connections that can be routed to the desired cluster nodes.
-We route users of cluster A to it's existing login and OOD services.
-We route users of cluster B to a newly provisioned physical login node and VM instance OOD, hosted in the same project.
-We chose to retain a physical login node for Cluster B to avoid performance scaling concerns and because of the ease with which these can be deployed using the traditional cluster managers.
-The cloud-based application routers and OOD instance have access all necessary cluster services via the cluster provider network.
-We use NFS to share the storage namespace with the SSH application router and OOD VM, as opposed to native GPFS clients as is the case with physical nodes connected to respective InfiniBand fabrics of the cluster environment.
-The storage workloads for sshpiper routing and OOD interaction are relatively light and have not presented performance issues using NFS.
+The RCS cloud services provide an ideal hosting environment for development and operation of this infrastructure.
+We provision the application routers and cluster B's OOD node to an OpenStack project dedicated to HPC production operations.
+The project is authorized to access campus and cluster provider networks made available to the project through the OpenStack SDN services.
+This allows the application routers to accept user connections that can be routed to the appropriate cluster.
+This virtualized infrastructure also helps frame their functionality traffic flow control points for the HPC service.
 
-**Consider** including sshpiper data we gathered to build our confidence in our methodology somewhere in here. No need for long discussion, no need for graphs, merely some numbers and text as an additional point of interest. Want to indicate we are sensitive to performance concerns.
+We considered the potential for performance impacts in moving from hardware to virutal endpoints.
+Cloud-based HTTP services are well studied and did not present any concerns for OOD performance.
+In order to understand the performance impact on SSH from the sshpiper-based application router, we measured data transfer throughput for SCP operations with and without the use of sshpiper against the cluster login nodes, see Table ....
+We did find a measurable impact on SCP operations that transit the sshpiper router for connections originating from clients on low-latency, high-speed networks within the RCS environment.
+These, however, are not the source of user connections to our HPC service.
+For users accessing HPC from campus or off-campus network, the performance impact was minor.
+We consider this an acceptable trade-off for the advantages provided by SSH application routing.
+In the months since introducing the application routers, we have not observed any negative impacts to user workflows.
 
-**Also** The full OOD pipeline build runs in 20 minutes, and deployment runs in 3-5 minutes. The rapid deployment means we can get more testing done, enhancing quality.
-
-The cloud hosting environment is also a natural fit for CICD driven development and production workflows.
-A self-hosted GitLab instance provides CICD tooling to develop and deploy the SDHPC into production using a dedicated hpc-factory project.
-Developers contribute improvements to the hpc-factory which are validated with integration pipelines.
-New releases are delivered to production in a timely manor using deployment pipelines.
-
-This provides familiar software development paradigms that enable contributions from a broader community.
-It takes time to learn the full spectrum of HPC operations.
-Seasoned professionals are responsible for daily cluster operations and often do not have time for relatively minor updates to non-core services.
-Enabling early career developers to focus on more narrowly scoped services and successfully contribute features.
-
-The most significant advantage of this approach is to reduce the friction between development and production environments.
-Traditional approaches deploy ancillary HPC services to physical hardware in close proximity to the cluster.
-This introduces a technology gap between how production nodes attached to the HPC fabric are managed versus how these services are operated during development.
-That friction frequently leads to delays in updating services like OOD because they are deployed with to dedicated hardware with manual steps executed by core operations staff.
-Reducing this friction increases the velocity of releases and allows the HPC platform to more easily adapt to user requirements.
-Another advantage is that the same services can be deployed to any cloud environment which supports the construction of HPC environments on the most cost-effective platforms.
-
-<!---
-conclusion can mention the complexity of the data movement as separate work
-this does acheive our ability to fluidly move people and projects
-conclusion can note the side effect is more autonomy of science engagement which is helping drive our goal for end-user managed infrastructure.
--->
+The RCS cloud service is also a natural fit for CICD driven development, testing, and production deployment.
+Developers contribute improvements to the image factory which can be validated with integration pipelines.
+New releases are delivered to production in a timely manner using the same deployment pipelines used in development.
+This cloud-native software development workflow enables rapid feature iteratation during development cycles and reduce the friction between development and production environments.
+A new OOD image, the most complex build featured in this work, can be produced in less than twenty minutes.
+Deployment of testable environments takes about three mintues on  average.
+These rapid deployments lower testing barriers, increase test frequency, and enhance service quality.
 
 (conclusion)=
 # Conclusion
