@@ -25,14 +25,12 @@ authors:
     affiliations:
       - University of Alabama at Birmingham, Research Computing
 abstract: |
-  Software defined infrastructure for high-performance computing (SDHPC) can reduce user impacts during maintenance operations.
-  In our implementation, the complete system of users and resources was divided into two logical groups.
+  Software defined infrastructure for high-performance computing facilitates service availability.
+  An infrastructure of HTTP and SSH application routers is developed and deployed using continuous integration and continuous deployment pipelines.
+  We demonstrate the utility of this infrastructure to our motivating use case of limiting user downtime during maintenance operations.
+  In this implementation, the complete system of users and resources is divided into two logical groups.
   Based on group membership, users are exposed to only the resources associated with their group.
-  An infrastructure of application routers, deployed by continuous integration and continuous deployment (CI/CD) pipelines, route users to the appropriate gateways.
-
-  We demonstrate the utility of this infrastructure to our motivating use case of limiting user downtime during maintenance operations. We conclude with observations on functionality and highlight future directions.
-
-  Infrastructure has given us so much flexibility that...
+  We conclude with observations on functionality and highlight future directions.
 
 keywords:
   - High Performance Computing
@@ -83,10 +81,12 @@ Continuous integration and continuous deployment (CICD) methodologies enable gre
 To leverage the opportunity, we created a GitLab CI/CD workflow to build and deploy our application routers and OOD web services @gitlab-cicd.
 Our SDHPC CICD workflow ensures we can deliver features and bug fixes through regular, reproducible, version-controlled deployments.
 
-In this work we introduce SDHPC, a cloud-native infrastructure for managing interaction with HPC clusters.
+In this work we document SDHPC, a cloud-native framework for managing interaction with HPC clusters.
+We introduce a Research Computing System (RCS) model that describes a coherent infrastructure. 
+RCS provides the HPC services that are the focus of SDHPC and a development platform that supports cloud-native operations.
 The work builds on the web-native HPC experience provided by OOD by adding consistent application routing for both HTTP and SSH user connections to the HPC cluster.
-We contributed enhancements to sshpiper that allow connection routing decisions to be based user group memberships.
-We developed CICD pipelines to build application routers for HTTP and SSH connections to HPC.
+We contributed enhancements to sshpiper that allow SSH connection routing decisions to be based user group memberships.
+We developed CICD pipelines to build and deploy application routers for HTTP and SSH access to the HPC services.
 SDHPC is an Infrastructure as Code framework that enables the operation of cloud-native HPC services.
 
 (related-work)=
