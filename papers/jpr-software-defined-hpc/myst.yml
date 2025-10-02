@@ -13,7 +13,17 @@ project:
     - rule: doi-exists
       severity: ignore
       keys:
-        - citationTagInBibtex
+        - Lian2025
+        - gitlab-cicd
+        - openstack2025
+        - CRIXCBC2024
+        - Becker1999
+        - Shore2021
+        - Muse2023
+        - carlz-at-us.ibm.com2020
+        - Sedlmayer2020
+        - DcbloxHDcolo
+    - rule: citation-is-unique
 site:
   template: article-theme
   # options:
