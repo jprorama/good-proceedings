@@ -331,13 +331,24 @@ The project is authorized to access campus and cluster provider networks made av
 This allows the application routers to accept user connections that can be routed to the appropriate cluster.
 This virtualized infrastructure also helps frame their functionality traffic flow control points for the HPC service.
 
-We considered the potential for performance impacts in moving from hardware to virutal endpoints.
-Cloud-based HTTP services are well studied and did not present any concerns for OOD performance.
-In order to understand the performance impact on SSH from the sshpiper-based application router, we measured data transfer throughput for SCP operations with and without the use of sshpiper against the cluster login nodes, see Table ....
-We did find a measurable impact on SCP operations that transit the sshpiper router for connections originating from clients on low-latency, high-speed networks within the RCS environment.
-These, however, are not the source of user connections to our HPC service.
-For users accessing HPC from campus or off-campus network, the performance impact was minor.
+:::{table} SSH Application Router Throughput. All values in megabytes per second computed over thirty transfer tests.
+:label: table-sshperf
+:align: center
+
+| SCP Throughput | Avg | Median |
+| --- | --- | --- |
+| Without Router | 39.6 MB/sec | 38.4 MB/sec|
+| With Router    | 35.2 MB/sec | 33.5 MB/sec|
+
+:::
+
+We considered the potential for performance impacts on campus clients in moving from direct node access with out an application router to indirect node access with VM based application router.
+Cloud-based HTTP services are well studied, so HTTP application routing did not present us any concerns and we did not test the performance.
+In order to understand the performance impact on SSH for the sshpiper-based application router, we measured data transfer throughput for SCP operations with and without the use of sshpiper against the cluster login nodes, see [](#table-sshperf).
+Because we offer high-speed transfers with Globus, we focused our test scenarios on stardard SSH user access scenarios for HPC from wifi campus or off-campus networks.
+We found the the average performance impact was not much more than ten percent slower with the SSH application router.
 We consider this an acceptable trade-off for the advantages provided by SSH application routing.
+We acknowledge that a more comprehensive performance analysis is needed and will address this in future work.
 In the months since introducing the application routers, we have not observed any negative impacts to user workflows.
 
 The RCS cloud service is also a natural fit for CICD driven development, testing, and production deployment.
