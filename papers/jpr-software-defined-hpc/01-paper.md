@@ -9,21 +9,40 @@ exports:
 authors:
   - name: John-Paul Robinson
     affiliations:
-      - University of Alabama at Birmingham, Research Computing
+      - University of Alabama at Birmingham, IT Research Computing
     orcid: 0009-0007-4063-2599
     email: jpr@uab.edu
+    roles:
+      - Conceptualization
+      - Writing – original draft
+      - Project administration
+      - Methodology
   - name: Louis Chen
     affiliations:
-      - University of Alabama at Birmingham, Research Computing
+      - University of Alabama at Birmingham, IT Research Computing
+    orcid: 0009-0005-7118-1712
+    roles:
+      - Software
+      - Validation
   - name: Eesaan Atluri
     affiliations:
-      - University of Alabama at Birmingham, Research Computing
+      - University of Alabama at Birmingham, IT Research Computing
+    roles:
+      - Software
+      - Validation
   - name: Krish Moodbidri
     affiliations:
-      - University of Alabama at Birmingham, Research Computing
+            - University of Alabama at Birmingham, IT Research Computing
+    roles:
+      - Software
+      - Validation
   - name: William Warriner
     affiliations:
-      - University of Alabama at Birmingham, Research Computing
+      - University of Alabama at Birmingham, IT Research Computing
+    orcid: 0000-0002-9733-9187
+    roles:
+      - Writing – review & editing
+      - Validation
 abstract: |
   Software defined infrastructure for high-performance computing facilitates service availability.
   An infrastructure of HTTP and SSH application routers is developed and deployed using continuous integration and continuous deployment pipelines.
