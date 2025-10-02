@@ -114,7 +114,7 @@ IT staff secure the physical systems, and researchers are empowered to build clo
 
 <!-- things what use openstack -->
 The NSF-funded Jetstream2 project is an at-scale cloud computing environment available to researchers through the NSF ACCESS program [@Hancock2021; @Boerner2023].
-The NFS ACCESS program is the successor to the XSEDE program which nurtured the development of national HPC resources to support research workflows @Towns2014.
+The NSF ACCESS program is the successor to the XSEDE program which nurtured the development of national HPC resources to support research workflows @Towns2014.
 Jetstream2 is built using OpenStack to provide cloud-native abstract research applications that need compute, storage, and network resources.
 Jetstream2 allocates capacity for CPU, GPU, and storage using ACCESS-granted service unit credits.
 Jetstream2 demonstrates at-scale operations of OpenStack clouds and provides autonomous access to advanced hardware for the development of research workflows.
