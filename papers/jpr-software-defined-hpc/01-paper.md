@@ -241,7 +241,7 @@ The HPC system is only available to authorized users and the HTTPS and SSH appli
 
 SSH and HTTP application routers direct user traffic to login nodes, OOD instances, and the account app according to site operational goals.
 This creates a coherent user experience for HPC access that is consistent across both HTTP and SSH endpoints.
-Implementing these routers as software defined infrastructure (SDI) allows continuous development of platform features and control over the introduction of capabilities as they are deployed.
+Implementing these services as Infrastructure as Code (IaC) allows continuous development of platform features and control over the introduction of capabilities as they are deployed @Ramos2015.
 
 Our CICD workflows are built using GitLab CI/CD @gitlab-cicd.
 We use a dedicated GitLab repository to house the CICD pipelines, following the image factory pattern @Muse2023.
@@ -345,29 +345,29 @@ These rapid deployments lower testing barriers, increase test frequency, and enh
 
 (conclusion)=
 # Conclusion
-
-Infrastructure as code demands programmatic control over infrastructure.
-Automated construction of nodes ensures they reliably contain appropriate components and configurations to implement the service.
-Programmatic control of infrastructure ensures services are properly integrated with the production environment.
-These controls are common during development.
-Ensuring the same experience for production reduces deployment friction and leads to improvement in the user experience.
-Moving services to a cloud native model is necessary to ensure the steps that are built and tested during development are valid for the production environment.
-
 <!--- note disaggration of ood and account app -->
 
-We introduced user-based application routing for SSH and HTTP connections to the HPC environment.
-We leveraged on-site cloud computing resources in our RCS to build CICD pipelines for our application routers and OOD services creating a SDHPC framework.
-This framework has facilitated a data and cluster migration project while minimizing user disruptions.
-The SDHPC is responsive to bug fixes and supports timely deployment of feature enhancements.
+We introduced application routing for SSH and HTTP connections based on user identity.
+We leveraged on-site cloud computing resources in our RCS to built CICD pipelines for our application routers and OOD services creating a SDHPC framework.
+This framework has facilitated a complex data and cluster migration project while minimizing user disruptions.
 
-These new platform features help create a managed HPC user experience.
-Policy-based routing of user workloads maintains service availability in the face of significant changes to underlying systems.
-It has facilitated data migration for a major storage upgrade and will support additional improvements to the HPC system in the future.
+These new platform features help create a cloud-native HPC user experience.
+Policy-based routing of user workloads maintains service availability in the face of significant changes to underlying infrastructure.
+SDHPC has facilitated data migration for a major storage upgrade and will support additional improvements to the HPC system in the future.
 Using flexible, modern paradigms like CICD creates testable features with reduced development time and reliable deployments.
 Providing stable services that can be enhance through continuous development and capacity expansion is the goal of cloud-native platforms.
 
+We are also expanding use of the image factory model to simplify introduction of new HPC services and reduce maintenance overhead.
+Creating consistent CICD workflows for development and production 
+IaC demands programmatic control over infrastructure.
+Automated construction of systems improves their reliability.
+Moving service construction to a cloud-native model is necessary to ensure the steps that are built and tested during development are valid for the production environment.
+SDHPC is responsive to bug fixes and supports timely deployment of feature enhancements.
+
 Data migrations are complex undertakings.
 The longer data sits still the harder it becomes to move.
-This experience is leading us to explore continuous data movement to reduce the dwell time and dependency on specific storage hardware.
-We are also expanding use of the image factory model to simplify introduction of new HPC service and reduce maintenance overhead.
-By creating consistent CICD workflows between development and production to deploy application routers we have moved our HPC cluster to a cloud-native orientation that provides comprehensive control over the user experience.
+This migration experience is leading us to explore ways to operationalize data movement.
+It is important to ensure that data always resides on the most appropriate storage resources.
+The motivation for these ideas is to avoid having data pool on the oldest hardware simply because that is where it originally landed.
+This approach should help avoid heavy lifts in the future when platforms are retired.
+Effectively developing these data workflows requires automated processes that can implement placement based on site policy.

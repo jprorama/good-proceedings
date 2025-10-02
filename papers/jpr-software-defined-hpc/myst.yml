@@ -26,6 +26,7 @@ project:
         - osti_mpifileutils
         - Fowler2010
         - Humble2013
+        - Ramos2015
     - rule: citation-is-unique
 site:
   template: article-theme
