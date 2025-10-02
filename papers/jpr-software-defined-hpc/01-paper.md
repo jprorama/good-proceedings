@@ -67,9 +67,9 @@ Because OOD hides these details, researchers can more readily envision HPC enabl
 
 OOD operates by mapping browser interactions to per-user web servers.
 When a user connects to the HPC system via HTTPS, the OOD server spawns a web server process running under their account identity, as defined on the HPC system.
-Whenever the user launches an application, processes started by their web server run within this identity context.
+Whenever the user executes actions on the web site, processes started by the web server run within their identity context.
 The net effect is that user engagement with the HPC system is shepherded by software definitions—identity, operating system rules, OOD application definitions, and the scheduler.
-User interaction via OOD is governed by the same permissions enforced by operating system on all the user's processes, whether started via OOD or via a traditional command-line accessed via SSH.
+User interaction via OOD is governed by the same permissions enforced by the operating system on all the user's processes, whether started via OOD or via a traditional command-line accessed via SSH.
 
 NOTE: OOD solved a problem that let us do the thing. The "wart" in the OOD solution is the traditional SSH access. This is one of the problems we solved.
 
@@ -276,7 +276,7 @@ For the deployment pipelines, we choose to directly invoke OpenStack CLI command
 We have used Terraform for the deploy phase of other system components not featured in this work and plan to migrate SDHPC artifact deployment to Terraform in the future.
 
 The separation of build and deploy steps enables us to construct versioned VM binaries that can be used across development, test, and production environments.
-The deploy steps focus on customizations that meet the needs of specific environments, providing late-binding hooks and other customizations for dev, test, and prod clusters.
+The deploy steps focus on customizations that meet the needs of specific environments, providing late-binding hooks for dev, test, and prod clusters.
 
 <!---
 ### Core Infrastructure Builds
