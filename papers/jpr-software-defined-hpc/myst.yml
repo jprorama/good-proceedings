@@ -23,6 +23,9 @@ project:
         - carlz-at-us.ibm.com2020
         - Sedlmayer2020
         - DcbloxHDcolo
+        - osti_mpifileutils
+        - Fowler2010
+        - Humble2013
     - rule: citation-is-unique
 site:
   template: article-theme
