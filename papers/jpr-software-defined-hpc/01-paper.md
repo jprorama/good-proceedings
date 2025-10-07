@@ -331,15 +331,19 @@ The project is authorized to access campus and cluster provider networks made av
 This allows the application routers to accept user connections that can be routed to the appropriate cluster.
 This virtualized infrastructure also helps frame their functionality traffic flow control points for the HPC service.
 
-:::{table} SSH Application Router Throughput. All values in megabytes per second computed over thirty transfer tests.
+:::{table} SSH Throughput Tests. All values in Megabytes per second. Tested SCP of a 2 Gigabyte file to destination hosts, results over averge of thirty test for each scenario. All tests originate from a VM in an OpenStack Project and represent performance of wired clients. The originating VM is used to connect a project-local VM, to the existing physical login node, and to three different SSH proxy scenarios.  The proxy scenarios quantify the impact of the double SSH connection required to connect via a proxy to the destination login node.
 :label: table-sshperf
 :align: center
+:width: 100%
 
-| SCP Throughput | Avg | Median |
-| --- | --- | --- |
-| Without Router | 39.6 MB/sec | 38.4 MB/sec|
-| With Router    | 35.2 MB/sec | 33.5 MB/sec|
 
+| SCP Throughput to Target                    | Mean                   | Error Margin      | Confidence |
+|---------------------------------------------|-----------------------|-------------|-------------|
+| VM in Project | 369.33 | 7.92 | 361.42 -- 377.25 |
+| Login node     | 119.80 | 7.11 | 112.69 -- 126.92 |
+| Proxy via physical node | 98.45  | 4.81 |  93.64 -- 103.26 |
+| Proxy via VM in Project | 84.44 | 5.32 |  79.13 --  89.76 |
+| Proxy via sshpiper | 81.47 | 1.52 |  79.95 --  82.99 |
 :::
 
 We considered the potential for performance impacts on campus clients in moving from direct node access with out an application router to indirect node access with VM based application router.
