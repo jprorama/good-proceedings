@@ -118,19 +118,19 @@ IT staff can guard access to the physical systems running OpenStack to ensure se
 Deploying OpenStack for research infrastructure decouples IT operations and research software development.
 
 <!-- things what use openstack -->
-The NSF-funded Jetstream2 project is an at-scale cloud computing environment available to researchers through the NSF ACCESS program [@Hancock2021; @Boerner2023].
+The NSF-funded Jetstream2 project is a cloud computing environment available to researchers through the NSF ACCESS program [@Hancock2021; @Boerner2023].
 The NSF ACCESS program is the successor to the XSEDE program which nurtured the development of national HPC resources to support research workflows @Towns2014.
-Jetstream2 is built using OpenStack to provide cloud-native abstract research applications that need compute, storage, and network resources.
+Jetstream2 is built using OpenStack and provides cloud-native abstractions to  research applications that need compute, storage, and network resources.
 Jetstream2 allocates capacity for CPU, GPU, and storage using ACCESS-granted service unit credits.
 Jetstream2 demonstrates at-scale operations of OpenStack clouds and provides autonomous access to advanced hardware for the development of research workflows.
 
 CRI\_XCBC is a legacy software project created by the XSEDE program.
-It provides a working example of a deployable, extensible HPC stack that used Ansible playbooks to deploy and OpenHPC defined infrastructure @CRIXCBC2024.
-We maintain a site-specific fork of CRI\_XCBC to as our foundation for software defined cluster environments @Robinson2025.
+It provides a working example of a deployable, extensible HPC stack that used Ansible playbooks to deploy an OpenHPC defined cluster infrastructure @CRIXCBC2024.
+We maintain a site-specific fork of CRI\_XCBC that serves as our foundation for software defined cluster environments @Robinson2025.
 We extended this code-base to include OOD web services as part of the Ansible-deployed OpenHPC cluster @Tripathi2020.
-We further extend this Ansible code-base in this work.
+We further extend this Ansible code-base to support SDHPC in this work.
 
-The "data center as a computer" model facilitates systems development, abstracting each subsystem as the component in a personal computer @Barroso2019.
+The "data center as a computer" model facilitates systems development, abstracting complex subsystems as the component in a personal computer @Barroso2019.
 Compute resources, both HPC and cloud, form the central processing unit (CPU).
 Compute-adjacent storage, such as block devices and parallel network file storage, is system memory.
 Object storage is hard drives, and the internal networks are mainboard traces and cables.
