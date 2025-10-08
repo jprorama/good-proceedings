@@ -29,6 +29,8 @@ project:
         - Ramos2015
         - Robinson2025
         - uabrc2025
+        - HashiCorpPacker2025
+        - HashiCorpTerraform2025
     - rule: citation-is-unique
 site:
   template: article-theme

@@ -144,7 +144,7 @@ HPC clusters have long aligned with the principles of software defined infrastru
 The original Beowulf model deployed fleets of identical commodity compute nodes under the control of a head node that also supplied core infrastructure for HPC operations @Becker1999.
 Cloud infrastructure leverages these same approaches to provide scalable compute, storage, and network capacity @Lenk2009.
 
-We adopted data center as computer to align our research computing infrastructure with a coherent system architecture.
+We adopted the data center as computer model to align our research computing infrastructure with a coherent system architecture.
 The resulting platform serves as a target for SDHPC operations.
 Application routers direct user connections to physical HPC systems infrastructure.
 We follow Agile methodologies to facilitate development and management of the SDHPC services @Shore2021.
@@ -167,28 +167,28 @@ consider replacing with an svg rendering or similar
 :label: rcs_architecture
 :alt: RCS architecture shows a collection of nested boxes designating system boundaries for the system as a whole and each interior subsystem. The boxes are connected with lines representing the network interconnects.
 
-RCS architecture following design of warehouse scale machines. Shows batch, vm, and container compute modalities connected to file, block, and object storage modalities via interconnect and peering to external networks.
+The RCS architecture follows the design of warehouse scale machines. The figure shows the HPC batch, virtual machine, and container compute modalities connected to file, block, and object storage modalities of the system via a network interconnect that also provides peering to external networks.
 ```
 
-RCS compute services provide HPC batch, virtual machine, and container modalities.
-The compute services leverage storage services that provide parallel file systems, block devices, and object storage.
+RCS compute services provide HPC batch, virtual machine (VM), and container modalities.
+The compute services leverage storage services that provide parallel file systems, block devices, and object storage from pools of commoditity storage hardware.
 Compute and storage services are interconnected by networks that provide bandwidth for both east-west and north-south traffic flows.
-The RCS peers with external networks, providing access from campus and external Research and Education (R&E) networks via a Science DMZ (SciDMZ) segment @Dart2013.
+RCS peers with external networks, providing access from campus and external Research and Education (R&E) networks via a Science DMZ (SciDMZ) segment @Dart2013.
 
-HPC batch computing is implemented via a traditional, physical compute cluster.
+HPC batch computing is implemented via a traditional, physical cluster of compute nodes.
 At our site, the HPC cluster is deployed using Bright Cluster Manager.
 Compute nodes connect to a GPFS parallel file system via a dedicated Infiniband network.
 
-RCS positions the HPC infrastructure along-side platforms that provide VM and container abstractions to applications.
-The VM compute capacity is implemented via an on-premise OpenStack-based cloud.
-This provides a comprehensive software defined infrastructure enabling the direct control over compute, storage and network resources needed to build and operate applications.
-We use this infrastructure to host the application routers, OOD web application, and CICD workflows describe the in following subsections.
+RCS positions the HPC infrastructure along-side companion services that provide VM and container abstractions to applications.
+The VM compute service is implemented via an on-premise OpenStack-based cloud.
+OpenStack provides a comprehensive software defined infrastructure enabling the direct control over compute, storage and network resources needed to build and operate applications.
+We use this infrastructure to host the application routers, OOD web application, and CICD workflows described in the following subsections.
 Container compute capacity for RCS is implemented via Kubernetes.
 Today, SDHPC exclusively uses the VM and batch subsystems.
-Work remains to port SDHPC to a microservices architecture.
+Work remains to leverage microservice architectures in SDHPC.
 
 In addition to GPFS parallel storage for HPC workloads, our implementation of RCS leverages Ceph storage subsystems to deliver block and object storage services to OpenStack and Kubernetes based workloads.
-Ceph additionally provides public S3 endpoints for user data and Cephfs as a capacity tier backend for GPFS to help manage cost.
+Ceph additionally provides public S3 endpoints for user data and Cephfs as a capacity tier backend for GPFS to help manage storage costs.
 R&E network peering is provided by a SciDMZ segment that uses Globus as the I/O interface for moving data to GPFS and allows users to manage other storage services via additional Globus connectors @Chard2016.
 Campus peering provides network access to all services in the RCS simplifying compliance with campus IT policies.
 Enhancements to RCS network interfacing are under consideration to expand services delivered via the SciDMZ.
@@ -197,28 +197,28 @@ Enhancements to RCS network interfacing are under consideration to expand servic
 ## Application Routers
 
 OOD elevates HPC to web-native experience.
-Our goal with SDHPC is to elevate HPC to a cloud-native experience.
+Our goal with SDHPC is to elevate HPC to a cloud-native experience for system users and operators.
 To achieve this goal it is necessary to have full control over all aspects of user interaction with the HPC platform.
 Routing users to appropriate services based on their identity is key to ensuring a consistent exprience.
 We built application routers for HTTPS and SSH connections.
 The routers can direct user connections to specific endpoints based on user identity and account status.
 
-Routing HTTPS connections is standard fare for Web-native applications.
+Routing HTTPS connections is standard fare for web-native applications.
 We built a dedicated front-end HTTPS application router that directs users to an OOD instance based on their group membership.
 The HTTPS router acts as a reverse proxy that authenticates the user via web SSO and routes their connection to the appropriate endpoint.
-Our HTTPS router requirements were readily satisfied with standard Apache reverse-proxy and web SSO features.
+Our HTTPS router requirements were readily satisfied with standard Apache reverse-proxy and web SSO modules.
 We leverage user account attributes to make the routing decision.
 
 Routing SSH connections is less common.
 In addition, routing SSH connections based on user identity introduces special considerations.
 The user identity is not confirmed until the SSH connection is terminated and the session is authenticated.
-Once this SSH session active, it ordinarily results in a login shell on the endpoint which terminated the connection, implicitly preventing further routing.
+Once the SSH session is active, it ordinarily results in the creation of a login shell on the host which serves as the endpoint of the connection, implicitly preventing further routing.
 To accomplish rule-based SSH routing based on user identity, we implemented an SSH application router using sshpiper, a reverse proxy for SSH built on Golang's SSH library @Lian2025.
 We contributed an enhancement to sshpiper that allows a user's group membership to be use in the routing rules.
 
 The SSH application router enables user connection routing to preferred login nodes based on site policy or other operational requirements.
 The sshpiper routing works by terminating the client-side SSH connection and establishing a secondary internal SSH connection to the desired login node endpoint.
-For password-based authentication, the users credentials are passed to and validated by the login node endpoint.
+For password-based authentication, the user's credentials are passed to and validated by the login node endpoint.
 For key-based authentication, the user authentication is managed using internal cluster keys shared via the file system.
 This uses the same infrastructure already in place on the HPC system.
 HPC systems will typically allow users to transparently access compute nodes running their jobs without prompting for additional authentication.
@@ -236,10 +236,10 @@ This capability ensures authorized users experience little more than a slight ac
 We define a basic set of account states like good\_standing, certification\_required, and account\_hold to facilitate operations.
 Only users with an account in good\_standing are allowed to interact with the HPC system via OOD or SSH.
 Other states direct user connections to the account app so they can address any requirements to reestablish their good\_standing state.
-The account\_hold state provides explicit control to support personal over individual user access to HPC resources for service events or other user engagements.
+The account\_hold state provides explicit control to support personnel over individual user access to HPC resources for service events or other user engagements.
 
 The application routers and account states combine to fully control user interaction with the HPC services provided by RCS.
-The HPC system is only available to authorized users and the HTTPS and SSH application routers ensure connections are only estabilished with the endpoints that can provide services to specific users.
+The HPC system is only available to authorized users and the HTTPS and SSH application routers ensure connections are only established with the endpoints that can provide services to specific users.
 
 (sdhpc-cicd)=
 ## CICD Pipelines
@@ -250,22 +250,23 @@ Implementing these services as Infrastructure as Code (IaC) allows continuous de
 
 Our CICD workflows are built using GitLab CI/CD @gitlab-cicd.
 We use a dedicated GitLab repository to house the CICD pipelines, following the image factory pattern @Muse2023.
-We created CICD pipelines with separate build and deploy phases.
+We created CICD pipelines with separate build and deploy phases @uabrc2025.
 Both phases leverage Ansible to construct relevant artifacts.
-The RCS cloud subsystem provides the infrastructure for development, build, and deployment workflows @uabrc2025.
-This enables the construction of comprehensive cloud-native workflows and facilates tight integration with campus HPC resources via direct connection to relavent provider networks.
+The RCS cloud subsystem provides the infrastructure for development, build, and deployment workflows.
+This enables the construction of comprehensive cloud-native application construction workflows and facilates tight integration with campus HPC resources via direct connection to relavent provider networks.
 
-Packer templates are used to construct VM images for the proxies, OOD and account app during the build phase.
-These templates include extensions to interface with the OpenStack API and can readily work with other cloud providers.
+Packer templates are used to construct VM images for the proxies, OOD and account app during the build phase @HashcorpPacker2025.
+These templates include extensions to interface with the OpenStack API available in RCS.
+Additional modules readily work with other cloud providers, ensuring workflow portability.
 We execute daily builds of our OOD image.
 This ensures image construction remains viable and surfaces problems with build dependencies in a timely fashion.
-The daily builds also support developement deploys to review feature improvements against our production HPC system.
+The daily builds also support nightly deploys to review OOD feature improvements and bug fixes against our production HPC system.
 
 For the deployment pipelines, we choose to directly invoke OpenStack CLI commands for implementation convenience.
-We have used Terraform for the deploy phase of other system components not featured in this work and plan to migrate SDHPC artifact deployment to Terraform in the future.
+We have used Terraform for the deploy phase of other system components not featured in this work and plan to migrate SDHPC artifact deployment to Terraform in the future @HashiCorpTerraform2025.
 
 The separation of build and deploy steps enables us to construct versioned VM binaries that can be used across development, test, and production environments.
-The deploy steps focus on customizations that meet the needs of specific environments, providing late-binding hooks for dev, test, and prod clusters.
+The deploy steps focus on customizations that meet the needs of specific environments, providing late-binding hooks for integration with dev, test, and prod clusters.
 
 (sdhpc-applied)=
 # SDHPC for Data and Cluster Migration
