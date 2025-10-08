@@ -27,6 +27,7 @@ authors:
   - name: Eesaan Atluri
     affiliations:
       - University of Alabama at Birmingham, IT Research Computing
+    orcid: 0009-0004-1699-2849
     roles:
       - Software
       - Validation
@@ -49,7 +50,13 @@ abstract: |
   We demonstrate the utility of this infrastructure to our motivating use case of limiting user downtime during maintenance operations.
   In this implementation, the complete system of users and resources is divided into two logical groups.
   Based on group membership, users are exposed to only the resources associated with their group.
-  We provide insights on SSH applicaiton router perforamnce and conclude with observations on functionality and highlight future directions.
+  We provide insights on SSH application router performance and conclude with observations on functionality and highlight future directions.
+
+acknowledgments: |
+  We extend our gratitude to several individuals who generously shared their expertise and helped us improve our understanding of tools leveraged in this work.
+  Doug Johnson at the Ohio Supercomputer Center for sharing insights on their experience with large scale data migration.
+  John Micheal Lowe and Jeremy Fischer at Indiana University for deep insight on Jetstream2 operations.
+  We appreciate their professional courtesy but accept all responsibility for the implementation choices and conclusions presented in this work.
 
 keywords:
   - High Performance Computing
@@ -65,7 +72,7 @@ keywords:
 
 The promise of scientific discovery drives the computing needs of researchers.
 Advances in research computing technology arise in response to those needs.
-Scientists must adapt to a competative, rapidly-changing research landscape.
+Scientists must adapt to a competitive, rapidly-changing research landscape.
 As such, research computing staff must quickly adapt systems to changing requirements and improving technology, while minimizing impact to researcher operations.
 Traditional high-performance computing (HPC) infrastructure is defined by fixed services closely aligned with hardware layouts.
 In contrast, a software defined infrastructure for high-performance computing (SDHPC) is responsive and flexible, enabling in-flight upgrades with reduced researcher impact.
@@ -104,7 +111,7 @@ Our SDHPC CICD workflow ensures we can deliver features and bug fixes through re
 In this work we document SDHPC, a cloud-native framework for managing interaction with HPC clusters.
 We introduce a Research Computing System (RCS) model that describes a coherent infrastructure for building scientific applications.
 RCS provides both the HPC services that are the focus of SDHPC and a development platform that supports cloud-native automation.
-We decribe the implementation of SDHPC and the cloud-native automation used to build and operate these services.
+We describe the implementation of SDHPC and the cloud-native automation used to build and operate these services.
 We discuss data and data-center migrations that served the  motivating use case for SDHPC development.
 We provide insights on SSH application router performance and conclude with reflections on the utility of SDHPC and future directions.
 
@@ -171,7 +178,7 @@ The RCS architecture follows the design of warehouse scale machines. The figure 
 ```
 
 RCS compute services provide HPC batch, virtual machine (VM), and container modalities.
-The compute services leverage storage services that provide parallel file systems, block devices, and object storage from pools of commoditity storage hardware.
+The compute services leverage storage services that provide parallel file systems, block devices, and object storage from pools of commodity storage hardware.
 Compute and storage services are interconnected by networks that provide bandwidth for both east-west and north-south traffic flows.
 RCS peers with external networks, providing access from campus and external Research and Education (R&E) networks via a Science DMZ (SciDMZ) segment @Dart2013.
 
@@ -199,7 +206,7 @@ Enhancements to RCS network interfacing are under consideration to expand servic
 OOD elevates HPC to web-native experience.
 Our goal with SDHPC is to elevate HPC to a cloud-native experience for system users and operators.
 To achieve this goal it is necessary to have full control over all aspects of user interaction with the HPC platform.
-Routing users to appropriate services based on their identity is key to ensuring a consistent exprience.
+Routing users to appropriate services based on their identity is key to ensuring a consistent experience.
 We built application routers for HTTPS and SSH connections.
 The routers can direct user connections to specific endpoints based on user identity and account status.
 
@@ -222,8 +229,8 @@ For password-based authentication, the user's credentials are passed to and vali
 For key-based authentication, the user authentication is managed using internal cluster keys shared via the file system.
 This uses the same infrastructure already in place on the HPC system.
 HPC systems will typically allow users to transparently access compute nodes running their jobs without prompting for additional authentication.
-This is done by creating an SSH keypair at account creation and automitically adding it to the user's authorized-keys file.
-We use this existing HPC infrastructure to facilate sshpiper operations.
+This is done by creating an SSH keypair at account creation and automatically adding it to the user's authorized-keys file.
+We use this existing HPC infrastructure to facilitate sshpiper operations.
 
 In order to align with the self-directed nature of cloud-native platforms, we previously built an account app that allows authorized users to create their HPC account.
 User's without HPC accounts are redirected to the account app.
@@ -253,7 +260,7 @@ We use a dedicated GitLab repository to house the CICD pipelines, following the 
 We created CICD pipelines with separate build and deploy phases @uabrc2025.
 Both phases leverage Ansible to construct relevant artifacts.
 The RCS cloud subsystem provides the infrastructure for development, build, and deployment workflows.
-This enables the construction of comprehensive cloud-native application construction workflows and facilates tight integration with campus HPC resources via direct connection to relavent provider networks.
+This enables the construction of comprehensive cloud-native application construction workflows and facilitates tight integration with campus HPC resources via direct connection to relevant provider networks.
 
 Packer templates are used to construct VM images for the proxies, OOD and account app during the build phase @HashcorpPacker2025.
 These templates include extensions to interface with the OpenStack API available in RCS.
@@ -266,7 +273,7 @@ For the deployment pipelines, we choose to directly invoke OpenStack CLI command
 We have used Terraform for the deploy phase of other system components not featured in this work and plan to migrate SDHPC artifact deployment to Terraform in the future @HashiCorpTerraform2025.
 
 The separation of build and deploy steps enables us to construct versioned VM binaries that can be used across development, test, and production environments.
-The deploy steps focus on customizations that meet the needs of specific environments, providing late-binding hooks for integration with dev, test, and prod clusters.
+The deploy steps focus on customization to meet the needs of specific environments, providing late-binding hooks for integration with dev, test, and prod clusters.
 
 (sdhpc-applied)=
 # SDHPC for Data and Cluster Migration
@@ -279,7 +286,7 @@ We introduced SDHPC to maintain stable HTTP and SSH endpoint definitions for use
 :width: 100%
 :alt: Schematic showing boxes representing the application routers for HTTP and SSH at the top of the image with lines pointing to additional boxes below that represent the login and OOD nodes of distinct clusters A and B.
 
-An arrangement of the Software Defined HPC (SDHPC) framework to route users to distinct cluster environments based on their user identity and group membership. Group A web and ssh connections are routed to the login and OOD nodes of Cluster A and group B connections are routed to the logig and OOD nodes of Cluster B.
+An arrangement of the Software Defined HPC (SDHPC) framework to route users to distinct cluster environments based on their user identity and group membership. Group A web and ssh connections are routed to the login and OOD nodes of Cluster A and group B connections are routed to the login and OOD nodes of Cluster B.
 ```
 
 The SDHPC framework was developed in response to a confluence of events.
@@ -287,7 +294,7 @@ We were faced with vendor landscape changes, product licensing changes, product 
 
 The GPFS high-performance storage for the HPC service needed to be upgraded to the latest supported version.
 Changes in the vendor landscape required moving petabytes of data to a new GPFS implementation from a new vendor @Sedlmayer2020.
-Product license changes lead to a GPFS implementation that transparently moves inactive files to a capacity tier implmented with Cephfs @carlz-at-us.ibm.com2020.
+Product license changes lead to a GPFS implementation that transparently moves inactive files to a capacity tier implemented with Cephfs @carlz-at-us.ibm.com2020.
 This cost-effective design uses GPFS to provide a unified file namespace for HPC applications, maximizing performance for active analyses and capacity for file retention.
 
 Power constraints within the on-campus data center drove decisions to consolidate all RCS compute services in newly available high-powered racks at a nearby commercial data center @DcbloxHDcolo.
@@ -299,7 +306,7 @@ This configuration allows the on campus data center to continue hosting less pow
 The SDHPC framework helps navigate complex requirements.
 [Figure %s](#ab_cluster) highlights the HPC storage and data center migration use-case that drove its development.
 Implementing the migration required reconstructing the HPC service in the new data center facility.
-In order to avoid extended downtimes for the entire HPC community, we planned the data migration around moving isolated subsets of users in batches across the storage systems.
+In order to avoid extended downtime for the entire HPC community, we planned the data migration around moving isolated subsets of users in batches across the storage systems.
 We planned the compute migration by staging an initial footprint of HPC compute capacity as a separate cluster attached to the new GPFS platform in the new facility.
 
 We designate Cluster A in #fig:ab_cluster as the HPC resources associate with the original storage platform and Cluster B as the HPC resources associate with the new storage platform.
@@ -331,7 +338,7 @@ The RCS cloud service provides an ideal hosting environment for production SDHPC
 We provision the application routers and cluster B's OOD node to an OpenStack project dedicated to HPC production operations.
 The project is authorized to access campus and cluster provider networks made available to the project through the OpenStack software defined networking (SDN) services.
 This allows the application routers to accept user connections and route them to the appropriate cluster.
-Furthermore, this virtualized infrastructure helps frame the functionality of application routers as traffic flow control agents for HPC connections.
+Furthermore, this virtual infrastructure helps frame the functionality of application routers as traffic flow control agents for HPC connections.
 
 The RCS cloud service is also a natural fit for CICD driven workflows.
 Developer contributions to the image factory can be validated with integration pipelines.
@@ -345,11 +352,11 @@ These rapid deployments lower testing barriers, increase test frequency, and lea
 
 We considered the potential for performance impacts of SDHPC through the introduction of cloud-native (VM-based) application routers.
 HTTP reverse-proxies are a standard part of the OOD deployment and common for at-scale cloud deployments.
-As such, SDHPC HTTP application router performance did not present any concerns and was not explictly studied.
-We simply chose to align the HTTP applicaiton router configuration with VM sizing recommendations provided in the OOD documentation. 
+As such, SDHPC HTTP application router performance did not present any concerns and was not explicitly studied.
+We simply chose to align the HTTP application router configuration with VM sizing recommendations provided in the OOD documentation. 
 In order to understand impacts on SSH performance, however, we measured data transfer throughput for a variety of SSH connection scenarios with and without the use of the sshpiper application router.
 
-:::{table} SSH Throughput Tests. All values in Megabytes per second. Results of SCP transfers of a 2 Gigabyte file to destination hosts, averged over thirty tests.
+:::{table} SSH Throughput Tests. All values in Megabytes per second. Results of SCP transfers of a 2 Gigabyte file to destination hosts, averaged over thirty tests.
 :label: table-sshperf
 :align: center
 
@@ -363,7 +370,7 @@ In order to understand impacts on SSH performance, however, we measured data tra
 |E| Proxy via sshpiper | 81.47 | 1.52 |  79.95 --  82.99 |
 :::
 
-In [](#table-sshperf) we show the throughput of SSH data transfers using SCP to copy a two Gibabyte file (base-ten) to a target node.
+In [](#table-sshperf) we show the throughput of SSH data transfers using SCP to copy a two Gigabyte file (base-ten) to a target node.
 All tests originate from a VM in an OpenStack project.
 All SSH components, except for the sshpiper application router, are implemented using standard OpenSSH packages provided by vendor distributions.
 The results represent the performance of wired clients in different scenarios.
@@ -389,18 +396,18 @@ We can see that the introduction of the second SSH connection has about an 18% p
 This indicates that introduction of SSH application routing will impact throughput.
 
 Scenario D represents the same SSH jump host configuration as Scenario C but replaces the physical front-end node with a VM running in the same OpenStack project.
-This represents the intended cloud-native deployment for our SDHPC SSH applcation router but without introduction of the new Golang-base SSH implemenation in sshpiper.
+This represents the intended cloud-native deployment for our SDHPC SSH application router but without introduction of the new Golang-base SSH implementation in sshpiper.
 This configuration introduces an additional 10% drop in performance over Scenario C.
 
 Finally, Scenario E represents the planned production sshpiper deployment of the SDHPC SSH application router.
 This allows us to understand the performance of the Golang SSH package leveraged by sshpiper to provide the SSH proxy functionality.
-Camparing Scenario D and E, we see a slight increase in over head for this implementation.
-The sshpiper SSH application router, however, enjoys a signfinicant reduction in the error margin over all other scenarios.
+Comparing Scenario D and E, we see a slight increase in over head for this implementation.
+The sshpiper SSH application router, however, enjoys a significant reduction in the error margin over all other scenarios.
 This suggests stable performance for interactive command-line use.
 Although the sshpiper-based application router has lower throughput, we considered the stable performance ideal for interactive use.
 We also consider the throughput acceptable for less demanding data transfer workloads.
 We offer high-speed data transfer via Globus endpoints for demanding workloads.
-While Scenario E shows that SSH application routing only enjoys 2/3 the throughput over the unrouted Scenario B, the tests indicate this is most likely a result of the pipelined SSH connection rather than a limitation of sshpiper itself.
+While Scenario E shows that SSH application routing only achieves 2/3 the throughput over the un-routed Scenario B, the tests indicate this is most likely a result of the pipelined SSH connection rather than a limitation of sshpiper itself.
 Additionally, we note that sshpiper is the only scenario that supports per-user routing of SSH connections based on account attributes.
 
 A more detailed study of SSH application router performance is warranted.
@@ -427,7 +434,7 @@ SDHPC is responsive to bug fixes and supports timely deployment of feature enhan
 
 Data migrations are complex undertakings.
 The longer data sits still the harder it becomes to move.
-This migration experience is leading us to explore ways to operationalize data movement.
+This migration experience is leading us to explore ways to implement continuous data movement.
 It is important to ensure that data always resides on the most appropriate storage resources.
 We want to avoid having data pool on the oldest hardware simply because that is where it originally landed.
 This approach should help avoid heavy data lifts when current platforms are retired in the future.
