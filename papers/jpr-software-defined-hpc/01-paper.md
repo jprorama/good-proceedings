@@ -262,7 +262,7 @@ Both phases leverage Ansible to construct relevant artifacts.
 The RCS cloud subsystem provides the infrastructure for development, build, and deployment workflows.
 This enables the construction of comprehensive cloud-native application construction workflows and facilitates tight integration with campus HPC resources via direct connection to relevant provider networks.
 
-Packer templates are used to construct VM images for the proxies, OOD and account app during the build phase @HashcorpPacker2025.
+Packer templates are used to construct VM images for the proxies, OOD and account app during the build phase @HashCorpPacker2025.
 These templates include extensions to interface with the OpenStack API available in RCS.
 Additional modules readily work with other cloud providers, ensuring workflow portability.
 We execute daily builds of our OOD image.
