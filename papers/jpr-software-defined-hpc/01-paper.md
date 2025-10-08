@@ -54,8 +54,8 @@ abstract: |
 
 acknowledgments: |
   We extend our gratitude to several individuals who generously shared their expertise and helped us improve our understanding of tools leveraged in this work.
-  Doug Johnson at the Ohio Supercomputer Center for sharing insights on their experience with large scale data migration.
-  John Micheal Lowe and Jeremy Fischer at Indiana University for deep insight on Jetstream2 operations.
+  Doug Johnson at the Ohio Supercomputer Center for sharing insights on approaches to large scale data migration.
+  John Michael Lowe and Jeremy Fischer at Indiana University for deep insight on Jetstream2 operations.
   We appreciate their professional courtesy but accept all responsibility for the implementation choices and conclusions presented in this work.
 
 keywords:
