@@ -346,6 +346,7 @@ These rapid deployments lower testing barriers, increase test frequency, and lea
 We considered the potential for performance impacts of SDHPC through the introduction of cloud-native (VM-based) application routers.
 HTTP reverse-proxies are a standard part of the OOD deployment and common for at-scale cloud deployments.
 As such, SDHPC HTTP application router performance did not present any concerns and was not explictly studied.
+We simply chose to align the HTTP applicaiton router configuration with VM sizing recommendations provided in the OOD documentation. 
 In order to understand impacts on SSH performance, however, we measured data transfer throughput for a variety of SSH connection scenarios with and without the use of the sshpiper application router.
 
 :::{table} SSH Throughput Tests. All values in Megabytes per second. Results of SCP transfers of a 2 Gigabyte file to destination hosts, averged over thirty tests.
@@ -409,29 +410,26 @@ Nonetheless, we can envision the deployment of highly scalable environments give
 
 (conclusion)=
 # Conclusion
-<!--- note disaggration of ood and account app -->
 
-We introduced application routing for SSH and HTTP connections based on user identity.
-We leveraged on-site cloud computing resources in our RCS to built CICD pipelines for our application routers and OOD services creating a SDHPC framework.
-This framework has facilitated a complex data and cluster migration project while minimizing user disruptions.
-
-These new platform features help create a cloud-native HPC user experience.
+The SSH and HTTP application routing features of SDHPC facilitate the creation of a cloud-native HPC user experience.
 Policy-based routing of user workloads maintains service availability in the face of significant changes to underlying infrastructure.
-SDHPC has facilitated data migration for a major storage upgrade and will support additional improvements to the HPC system in the future.
-Using flexible, modern paradigms like CICD creates testable features with reduced development time and reliable deployments.
-Providing stable services that can be enhance through continuous development and capacity expansion is the goal of cloud-native platforms.
+SDHPC simplified data migration for a major storage upgrade and will support future improvements to the HPC service in RCS.
+Using cloud-native development paradigms and CICD pipelines for SDHPC operations also improves service reliability by simplifying feature testing and reducing the length of development cycles.
+Providing stable interfaces that support controlled introduction of platform features and infrastructure operations is the goal of cloud-native platforms.
+Nonetheless, work remains to minimize impacts on data transfer performance when routing SSH connections.
 
-We are also expanding use of the image factory model to simplify introduction of new HPC services and reduce maintenance overhead.
+We are expanding our use of the image factory model to simplify introduction of new HPC services and reduce maintenance overhead.
 Creating consistent CICD workflows for development and production 
 IaC demands programmatic control over infrastructure.
 Automated construction of systems improves their reliability.
-Moving service construction to a cloud-native model is necessary to ensure the steps that are built and tested during development are valid for the production environment.
+Moving service construction to a cloud-native model ensures IaC tested during development remains valid for production.
 SDHPC is responsive to bug fixes and supports timely deployment of feature enhancements.
 
 Data migrations are complex undertakings.
 The longer data sits still the harder it becomes to move.
 This migration experience is leading us to explore ways to operationalize data movement.
 It is important to ensure that data always resides on the most appropriate storage resources.
-The motivation for these ideas is to avoid having data pool on the oldest hardware simply because that is where it originally landed.
-This approach should help avoid heavy lifts in the future when platforms are retired.
+We want to avoid having data pool on the oldest hardware simply because that is where it originally landed.
+This approach should help avoid heavy data lifts when current platforms are retired in the future.
 Effectively developing these data workflows requires automated processes that can implement placement based on site policy.
+SDHPC provides the framework for improving HPC services on the RCS.
