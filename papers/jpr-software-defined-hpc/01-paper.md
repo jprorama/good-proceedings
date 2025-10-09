@@ -143,11 +143,11 @@ Additionally, the model is easy to reason about, improving stakeholder communica
 (sdhpc)=
 # Software Defined HPC
 
-HPC clusters have long aligned with the principles of software defined infrastructure  @Reed2014.
+HPC clusters have long aligned with the principles of software defined infrastructure @Reed2014.
 The original Beowulf model deployed fleets of identical commodity compute nodes under the control of a head node that also supplied core infrastructure for HPC operations @Becker1999.
 Cloud infrastructure leverages these same approaches to provide scalable compute, storage, and network capacity @Lenk2009.
 
-We adopted the data center as computer model to align our research computing infrastructure with a coherent system architecture.
+We adopted the "data center as a computer" model to align our research computing infrastructure with a coherent system architecture.
 The resulting platform serves as a target for SDHPC operations.
 Application routers direct user connections to physical HPC systems infrastructure.
 We follow Agile methodologies to facilitate development and management of the SDHPC services @Shore2021.
