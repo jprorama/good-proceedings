@@ -338,62 +338,55 @@ Deployment of testable integration environments takes only a few minutes, reduci
 We considered the potential for performance impacts of SDHPC through the introduction of cloud-native (VM-based) application routers.
 HTTP reverse-proxies are a standard part of the OOD deployment and common for at-scale cloud deployments.
 As such, SDHPC HTTP application router performance did not present any concerns and was not explicitly studied.
-We simply chose to align the HTTP application router configuration with VM sizing recommendations provided in the OOD documentation. 
+Instead, we chose to align the HTTP application router configuration with VM sizing recommendations provided in the OOD documentation.
 In order to understand impacts on SSH performance, however, we measured data transfer throughput for a variety of SSH connection scenarios with and without the use of the sshpiper application router.
 
 :::{table} SSH Throughput Tests. All values in Megabytes per second. Results of SCP transfers of a 2 Gigabyte file to destination hosts, averaged over thirty tests.
 :label: table-sshperf
 :align: center
 
-
-| Scenario | SCP Target                    | Mean                   | Error Margin      | Confidence |
-|----|---------------------------------------------|-----------------------|-------------|-------------|
-|A| Project VM | 369.33 | 7.92 | 361.42 -- 377.25 |
-|B| Login node     | 119.80 | 7.11 | 112.69 -- 126.92 |
-|C| Proxy via physical node | 98.45  | 4.81 |  93.64 -- 103.26 |
-|D| Proxy via Project VM | 84.44 | 5.32 |  79.13 --  89.76 |
-|E| Proxy via sshpiper | 81.47 | 1.52 |  79.95 --  82.99 |
+| Scenario | SCP Target              | Mean   | Error Margin | Confidence       |
+|----------|-------------------------|--------|--------------|------------------|
+| A        | Project VM              | 369.33 | 7.92         | 361.42 -- 377.25 |
+| B        | Login node              | 119.80 | 7.11         | 112.69 -- 126.92 |
+| C        | Proxy via physical node | 98.45  | 4.81         | 93.64 -- 103.26  |
+| D        | Proxy via Project VM    | 84.44  | 5.32         | 79.13 -- 89.76   |
+| E        | Proxy via sshpiper      | 81.47  | 1.52         | 79.95 -- 82.99   |
 :::
 
 In [](#table-sshperf) we show the throughput of SSH data transfers using SCP to copy a two Gigabyte file (base-ten) to a target node.
 All tests originate from a VM in an OpenStack project.
 All SSH components, except for the sshpiper application router, are implemented using standard OpenSSH packages provided by vendor distributions.
 The results represent the performance of wired clients in different scenarios.
-Scenario A, the originating VM is used to transfer data to a VM local to the OpenStack project used for testing.
-This provides a baseline for the maximum SSH performance achievable by the originating VM.
+In scenario A the originating VM is used to transfer data to a VM local to the OpenStack project used for testing.
+This provides an overall control for expected maximum SSH performance achievable by the originating VM.
 We do not expect to replicate this performance in other scenarios because all other tests are bound by the performance of the network throughput to the HPC login node, 10Gbps in the current environment.
-Scenario B, serves as our baseline for the SSH performance to the production interface of the existing HPC login node.
-Ideally, the performance of the remaining scenarios  would closely match this baseline.
+Scenario B serves as control for SSH performance to the production interface of the existing HPC login node.
+Ideally, the performance of the remaining scenarios would closely match this control.
 
-The remaining scenarios each represent different SSH proxy configurations.
-Each of these configurations imply the use of two SSH connections to reach the login node.
-These are the results we consider directly comparable for SDHPC SSH application routing.
-The proxy scenarios quantify the impact of the double SSH connection required to connect via a proxy to the destination login node.
+The remaining scenarios each represent different SSH proxy configurations, all of which use two SSH connections to reach the login node.
+These scenarios are most comparable to our SDHPC SSH application routing, capturing the impact of double SSH connection.
 
-Scenario C is standard SSH jump host configuration.
-An SSH connection is establish to the jumphost.
-A second SSH connection is then establish from the client to the target login node via the jump host.
-This configuration provides a baseline for proxied SSH connections by using SSH services running on physical hardware.
-The main advantage of this configuration is to avoid any potential hypervisor or SDN induced overhead for the SSH proxy point.
+Scenario C is a standard SSH jump host configuration where an SSH connection is established to the jump host, and a second SSH connection is established from client to login node through the jump host.
+With this configuration, we avoid all possible hypervisor and SDN overhead, giving us a basis for comparison with subsequent scenarios.
 We used the production login node as the jump host and a cluster compute node as stand-in for a physical login node accessed via proxy.
-This SSH path mirrors the cluster topology that is used to support sshpiper, a front end SSH target directly connected "within" the cluster to a target login node.
-We can see that the introduction of the second SSH connection has about an 18% performance impact on throughput.
-This indicates that introduction of SSH application routing will impact throughput.
+This SSH path mirrors the cluster topology supporting sshpiper, a front end SSH target directly connected "within" the cluster to a target login node.
+From the data, we see that the introduction of the second SSH connection decreased throughput by about 18% compared with scenario B, suggesting introduction of SSH application routing will impact real-world throughput.
 
-Scenario D represents the same SSH jump host configuration as Scenario C but replaces the physical front-end node with a VM running in the same OpenStack project.
-This represents the intended cloud-native deployment for our SDHPC SSH application router but without introduction of the new Golang-base SSH implementation in sshpiper.
-This configuration introduces an additional 10% drop in performance over Scenario C.
+Scenario D represents the same SSH jump host configuration as scenario C, but replaces the physical front-end node with a VM running in the same OpenStack project.
+This matches the intended cloud-native deployment for our SDHPC SSH application router but without introduction of the new Golang-base SSH implementation in sshpiper.
+This configuration introduces a 30% drop in performance compared with scenario B.
 
 Finally, Scenario E represents the planned production sshpiper deployment of the SDHPC SSH application router.
 This allows us to understand the performance of the Golang SSH package leveraged by sshpiper to provide the SSH proxy functionality.
-Comparing Scenario D and E, we see a slight increase in over head for this implementation.
-The sshpiper SSH application router, however, enjoys a significant reduction in the error margin over all other scenarios.
+Comparing scenario E to D, we observe a slight decrease in throughput, giving a 32% drop compared with scenario B.
+The sshpiper SSH application router, however, enjoys a significant reduction in the error margin over all other scenarios. <!-- see my comments in slack -->
 This suggests stable performance for interactive command-line use.
 Although the sshpiper-based application router has lower throughput, we considered the stable performance ideal for interactive use.
 We also consider the throughput acceptable for less demanding data transfer workloads.
 We offer high-speed data transfer via Globus endpoints for demanding workloads.
-While Scenario E shows that SSH application routing only achieves 2/3 the throughput over the un-routed Scenario B, the tests indicate this is most likely a result of the pipelined SSH connection rather than a limitation of sshpiper itself.
-Additionally, we note that sshpiper is the only scenario that supports per-user routing of SSH connections based on account attributes.
+While Scenario E shows that SSH application routing only achieves two-thirds the throughput over the un-routed Scenario B, the tests indicate this is most likely a result of the pipelined SSH connection rather than a limitation of sshpiper itself.
+Crucially, sshpiper is the only scenario that supports per-user routing of SSH connections based on account attributes.
 
 A more detailed study of SSH application router performance is warranted.
 It will be informative to understand the origin of performance impacts from pipelined SSH connections.
