@@ -77,14 +77,14 @@ As such, research computing staff must quickly adapt systems to changing require
 Traditional high-performance computing (HPC) infrastructure is defined by fixed services closely aligned with hardware layouts.
 In contrast, a software defined infrastructure for high-performance computing (SDHPC) is responsive and flexible, enabling in-flight upgrades with reduced researcher impact.
 
-Traditional HPC use centered on text-based, command-line  interactions where users connect via SSH to dedicated login nodes to execute batch-oriented research workflows @Lonvick2006.
+Traditional HPC use centered on text-based, command-line interactions where users connect via SSH to dedicated login nodes to execute batch-oriented research workflows @Lonvick2006.
 The development of immersive web interfaces to HPC systems provided a friendlier user experience, broadening access.
 Among these interfaces, Open OnDemand (OOD) has emerged as the most successful @Hudak2018.
 Now a fundamental component of many HPC systems, OOD has aligned user expectations with the self-directed experience of cloud-native applications.
 
 OOD owes its success to a reduction of cognitive load for researchers.
 The reference deployment of OOD provides access to several interactive, web-native applications.
-Jupyter Notebooks, R Studio, and a VNC desktop capable of presenting native, windowed applications, are all available behind a simple resource request form.
+Jupyter Notebooks, R Studio, and a virtual desktop capable of presenting native, windowed applications, are all available behind a simple resource request form.
 Researchers start by engaging with their HPC system via the browser using familiar web applications and, when they are ready, can migrate to batch tools at the command-line.
 Implementation details, such as submitting a job script to the scheduler, are hidden behind the software-defined abstractions of the resource request form and application definition.
 Because OOD hides these details, researchers can more readily incorporate HPC into their research workflows.
@@ -95,24 +95,24 @@ Whenever the user executes actions on the web site, processes started by the web
 The net effect is that user engagement with the HPC system is shepherded by software definitions—identity, operating system rules, OOD application definitions, and the scheduler.
 User interaction via OOD is governed by the same permissions enforced by the operating system on all the user's processes, whether started trough OOD or traditional command-line accessed via SSH.
 
-OOD transforms HPC into a web-native user experience.
-SDHPC transforms the HPC system into a cloud-native application.
+OOD transforms HPC user engagement into a web-native experience.
+SDHPC transforms the HPC system itself into a cloud-native application.
 Application routers for SSH and HTTPS enable us to modify the HPC environment for arbitrary subsets of the user community.
-Identity-based routing requires that the application routers authenticate users in order to direct their connections to the correct resources.
-Web authentication is handled by a web single sign-on (SSO) enabled Apache reverse-proxy that can route users based on group membership.
+This identity-based routing requires that the application routers authenticate users in order to direct their connections to the correct resources.
+Web authentication is handled by a web single sign-on (SSO) enabled Apache reverse-proxy routing users based on group membership.
 SSH authentication and routing is handled by sshpiper, an open-source SSH proxy built on top of the Golang SSH package @Lian2025.
-We contributed an extension that enables routing based on group membership.
+We contributed an extension to sshpiper that enables group-based routing.
 
 The application routers introduce an opportunity for horizontal scalability, further enabling SDHPC to deliver cloud-native infrastructure capabilities.
 Continuous integration and continuous deployment (CICD) methodologies enable greater scaling of cloud-native infrastructures @Ugwueze2024.
-To leverage the opportunity, we created a GitLab CI/CD workflow to build and deploy our application routers and OOD web services @gitlab-cicd.
+To leverage the opportunity, we created a GitLab CICD workflow to build and deploy our application routers and OOD web services @gitlab-cicd.
 Our SDHPC CICD workflow ensures we can deliver features and bug fixes through regular, reproducible, version-controlled deployments.
 
 In this work we document SDHPC, a cloud-native framework for managing interaction with HPC clusters.
 We introduce a Research Computing System (RCS) model that describes a coherent infrastructure for building scientific applications.
 RCS provides both the HPC services that are the focus of SDHPC and a development platform that supports cloud-native automation.
 We describe the implementation of SDHPC and the cloud-native automation used to build and operate these services.
-We discuss data and data-center migrations that served the  motivating use case for SDHPC development.
+We discuss data and data-center migrations that served the motivating use case for SDHPC development.
 We provide insights on SSH application router performance and conclude with reflections on the utility of SDHPC and future directions.
 
 (related-work)=
