@@ -156,44 +156,40 @@ CICD pipelines build and deploy the application routers and OOD services enablin
 (sdhpc-rcs)=
 ## Research Computing System
 
-<!--Building a cloud native experience. -->
-
-The Research Computing System (RCS) is a scalable, cloud-native platform that encapsulates the data center as the computer design, see [Figure %s](#rcs_architecture).
+The Research Computing System (RCS) is a scalable, cloud-native platform that encapsulates the "data center as a computer" design, demonstrated graphically in [Figure %s](#rcs_architecture).
 RCS delivers compute, storage, and networking services to research applications.
 
-<!--
-if we have time lets remake this figure to be publication-ready
-
-consider replacing with an svg rendering or similar
--->
 ```{figure} images/RCS Architecture.png
 :label: rcs_architecture
-:alt: RCS architecture shows a collection of nested boxes designating system boundaries for the system as a whole and each interior subsystem. The boxes are connected with lines representing the network interconnects.
+:alt: Network graph diagram of RCS architecture made of a collection of boxes, each containing text, connected by lines.
 
-The RCS architecture follows the design of warehouse scale machines. The figure shows the HPC batch, virtual machine, and container compute modalities connected to file, block, and object storage modalities of the system via a network interconnect that also provides peering to external networks.
+RCS architecture follows warehouse-scale computer design. Batch HPC, virtual machine (VM), and container compute modalities (top) are all connected to an L3 ethernet and infiniband interconnect (center). The interconnect links to a parallel file system (FS) and to multi-modal storage with FS, block, and object modalities (memory and HDD, bottom). The interconnect also provides peering to external networks (bottom).
 ```
 
-RCS compute services provide HPC batch, virtual machine (VM), and container modalities.
-The compute services leverage storage services that provide parallel file systems, block devices, and object storage from pools of commodity storage hardware.
+RCS compute services provide batch HPC, virtual machine (VM), and container modalities.
+Compute services leverage storage services that provide parallel file systems, block devices, and object storage from pools of commodity storage hardware.
 Compute and storage services are interconnected by networks that provide bandwidth for both east-west and north-south traffic flows.
-RCS peers with external networks, providing access from campus and external Research and Education (R&E) networks via a Science DMZ (SciDMZ) segment @Dart2013.
+RCS peers with external networks, providing access from campus and external Research and Education networks via a Science DMZ (SciDMZ) segment @Dart2013.
 
 HPC batch computing is implemented via a traditional, physical cluster of compute nodes.
-At our site, the HPC cluster is deployed using Bright Cluster Manager.
+At our site, the HPC cluster is deployed using Base Command Manager (BCM), formerly Bright Cluster Manager.
 Compute nodes connect to a GPFS parallel file system via a dedicated Infiniband network.
+RCS positions the HPC cluster infrastructure alongside companion services that provide VM and container abstractions to applications.
 
-RCS positions the HPC infrastructure along-side companion services that provide VM and container abstractions to applications.
-The VM compute service is implemented via an on-premise OpenStack-based cloud.
-OpenStack provides a comprehensive software defined infrastructure enabling the direct control over compute, storage and network resources needed to build and operate applications.
+VM compute services are implemented via an on-premises, OpenStack-based cloud.
+OpenStack provides a comprehensive, software-defined infrastructure enabling direct control over the compute, storage, and network resources needed to build and operate applications.
 We use this infrastructure to host the application routers, OOD web application, and CICD workflows described in the following subsections.
+
 Container compute capacity for RCS is implemented via Kubernetes.
 Today, SDHPC exclusively uses the VM and batch subsystems.
 Work remains to leverage microservice architectures in SDHPC.
 
-In addition to GPFS parallel storage for HPC workloads, our implementation of RCS leverages Ceph storage subsystems to deliver block and object storage services to OpenStack and Kubernetes based workloads.
-Ceph additionally provides public S3 endpoints for user data and Cephfs as a capacity tier backend for GPFS to help manage storage costs.
-R&E network peering is provided by a SciDMZ segment that uses Globus as the I/O interface for moving data to GPFS and allows users to manage other storage services via additional Globus connectors @Chard2016.
-Campus peering provides network access to all services in the RCS simplifying compliance with campus IT policies.
+Our implementation of RCS provides two storage subsystems: GPFS and Ceph.
+GPFS serves as parallel storage for HPC workloads, while Ceph delivers block and object storage services to OpenStack and Kubernetes based workloads.
+Public S3 endpoints are available for user data through Ceph object storage, and CephFS serves as a capacity tier backend for GPFS to help manage storage costs.
+Research and Education network peering is provided by a SciDMZ segment that uses Globus as data transfer interface for GPFS.
+Globus allows users to manage other storage services via additional connectors @Chard2016.
+Campus peering provides network access to all services in the RCS, simplifying compliance with campus IT policies.
 Enhancements to RCS network interfacing are under consideration to expand services delivered via the SciDMZ.
 
 (sdhpc-app-router)=
