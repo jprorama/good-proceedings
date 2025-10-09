@@ -197,48 +197,46 @@ Enhancements to RCS network interfacing are under consideration to expand servic
 
 OOD elevates HPC to web-native experience.
 Our goal with SDHPC is to elevate HPC to a cloud-native experience for system users and operators.
-To achieve this goal it is necessary to have full control over all aspects of user interaction with the HPC platform.
-Routing users to appropriate services based on their identity is key to ensuring a consistent experience.
+Achieving this goal requires full control over all aspects of user interaction with the HPC platform.
+Routing users to appropriate services based on their identity is crucial to ensuring a consistent experience.
 We built application routers for HTTPS and SSH connections.
-The routers can direct user connections to specific endpoints based on user identity and account status.
+To that end, we built application routers capable of directing user HTTPS and SSH connections to specific endpoints based on identity and account status.
 
 Routing HTTPS connections is standard fare for web-native applications.
 We built a dedicated front-end HTTPS application router that directs users to an OOD instance based on their group membership.
-The HTTPS router acts as a reverse proxy that authenticates the user via web SSO and routes their connection to the appropriate endpoint.
+The HTTPS router acts as a reverse proxy, authenticating users via web SSO and routing their connection to the appropriate endpoint.
 Our HTTPS router requirements were readily satisfied with standard Apache reverse-proxy and web SSO modules.
-We leverage user account attributes to make the routing decision.
+We leverage user account attributes to make routing decisions.
 
-Routing SSH connections is less common.
-In addition, routing SSH connections based on user identity introduces special considerations.
-The user identity is not confirmed until the SSH connection is terminated and the session is authenticated.
-Once the SSH session is active, it ordinarily results in the creation of a login shell on the host which serves as the endpoint of the connection, implicitly preventing further routing.
+In practice, SSH connection routing is less common, and routing SSH connections based on user identity introduces special considerations.
+User identity is not confirmed until the SSH connection is terminated and the session authenticated.
+Once the SSH session is active, it ordinarily results in the creation of a login shell on the host which serves as the connection endpoint, implicitly preventing further routing.
 To accomplish rule-based SSH routing based on user identity, we implemented an SSH application router using sshpiper, a reverse proxy for SSH built on Golang's SSH library @Lian2025.
-We contributed an enhancement to sshpiper that allows a user's group membership to be use in the routing rules.
+We contributed an enhancement to sshpiper which allows a user's group membership to be considered in its routing rules.
 
-The SSH application router enables user connection routing to preferred login nodes based on site policy or other operational requirements.
-The sshpiper routing works by terminating the client-side SSH connection and establishing a secondary internal SSH connection to the desired login node endpoint.
-For password-based authentication, the user's credentials are passed to and validated by the login node endpoint.
-For key-based authentication, the user authentication is managed using internal cluster keys shared via the file system.
-This uses the same infrastructure already in place on the HPC system.
-HPC systems will typically allow users to transparently access compute nodes running their jobs without prompting for additional authentication.
-This is done by creating an SSH keypair at account creation and automatically adding it to the user's authorized-keys file.
+The SSH application router enables routing to preferred login nodes based on site policy or other operational requirements.
+With sshpiper, routing works by terminating the client-side SSH connection and establishing a secondary, internal SSH connection to the desired login node endpoint.
+For password-based authentication, the user's credentials are passed to, and validated by, the login node endpoint.
+Key-based authentication is managed using internal cluster keys shared via the file system, using the same infrastructure already in place on the HPC system.
+HPC systems typically allow users transparent access to compute nodes running their jobs without prompting for additional authentication.
+We replicate this behavior by creating an SSH keypair as part of our account creation process, and automatically add it to the user's authorized-keys file.
 We use this existing HPC infrastructure to facilitate sshpiper operations.
 
-In order to align with the self-directed nature of cloud-native platforms, we previously built an account app that allows authorized users to create their HPC account.
-User's without HPC accounts are redirected to the account app.
-The account app prompts the user to create their account or instructs them that they are not authorized for this resource.
-After an authorized user submits their account request, the account app interacts with standard HPC account creation services, exposed via a RabbitMQ message bus.
-Once the account is created the user's web connection is redirected to OOD allowing the user to begin their HPC on-boarding.
-The self-directed account creation request typically takes less than fifteen seconds to complete.
+To align with the self-directed nature of cloud-native platforms, we previously built a web app for self-directed account creation and management.
+When attempting to authenticate to OOD, users without HPC accounts are redirected to the account app.
+If authorized, the app prompts users to create an account, otherwise informs them they are not authorized.
+After an authorized user submits their account creation request, the app interacts with standard HPC account creation services, exposed via a RabbitMQ message bus.
+When the account is created, the user's web connection is redirected to OOD, allowing the user to begin HPC on-boarding.
+The account creation request typically takes less than fifteen seconds to complete.
 This capability ensures authorized users experience little more than a slight account provisioning delay the first time the access the HPC system.
 
-We define a basic set of account states like good\_standing, certification\_required, and account\_hold to facilitate operations.
-Only users with an account in good\_standing are allowed to interact with the HPC system via OOD or SSH.
-Other states direct user connections to the account app so they can address any requirements to reestablish their good\_standing state.
-The account\_hold state provides explicit control to support personnel over individual user access to HPC resources for service events or other user engagements.
+We define a basic set of account states like "good\_standing", "certification\_required", and "account\_hold" to facilitate operations.
+Only users with accounts in "good\_standing" are allowed to interact with the HPC system via OOD or SSH.
+Users in other states have their connections redirected to the account app, informing them of their account state, giving them a chance to address any requirements to reestablish their "good\_standing" state.
+The "account\_hold" state provides explicit control to support personnel over individual user access to HPC resources for service events or other user engagements.
 
-The application routers and account states combine to fully control user interaction with the HPC services provided by RCS.
-The HPC system is only available to authorized users and the HTTPS and SSH application routers ensure connections are only established with the endpoints that can provide services to specific users.
+Combined, our application routers and account states enable full control over user interaction with HPC services provided by RCS.
+With the routers and account states in place, our HPC system remains available only to authorized users and connections are only established with resources appropriate to each user.
 
 (sdhpc-cicd)=
 ## CICD Pipelines
