@@ -404,17 +404,16 @@ Providing stable interfaces that support controlled introduction of platform fea
 Nonetheless, work remains to minimize impacts on data transfer performance when routing SSH connections.
 
 We are expanding our use of the image factory model to simplify introduction of new HPC services and reduce maintenance overhead.
-Creating consistent CICD workflows for development and production 
+Creating consistent CICD workflows for development and production.
 IaC demands programmatic control over infrastructure.
 Automated construction of systems improves their reliability.
 Moving service construction to a cloud-native model ensures IaC tested during development remains valid for production.
 SDHPC is responsive to bug fixes and supports timely deployment of feature enhancements.
 
-Data migrations are complex undertakings.
-The longer data sits still the harder it becomes to move.
-This migration experience is leading us to explore ways to implement continuous data movement.
-It is important to ensure that data always resides on the most appropriate storage resources.
-We want to avoid having data pool on the oldest hardware simply because that is where it originally landed.
+Data migrations are complex undertakings, and the longer data sits still the harder it becomes to move.
+So, it is important to ensure that data always resides on the most appropriate storage resources.
+This migration experience has led us to explore ways to implement continuous data movement.
+We want to avoid having data pool on the oldest hardware merely because that is where it originally landed.
 This approach should help avoid heavy data lifts when current platforms are retired in the future.
 Effectively developing these data workflows requires automated processes that can implement placement based on site policy.
 SDHPC provides the framework for improving HPC services on the RCS.
