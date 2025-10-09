@@ -118,31 +118,27 @@ We provide insights on SSH application router performance and conclude with refl
 (related-work)=
 # Related Work
 
-<!-- establishing value of OpenStack -->
 The success of research computing activities depends on access to information technology (IT) infrastructure: compute, storage, and networking.
 OpenStack, an open source cloud computing platform, provides software defined control over infrastructure @openstack2025.
 IT staff can guard access to the physical systems running OpenStack to ensure secure operations while democratizing access to resource abstractions that enable developers to build applications.
 Deploying OpenStack for research infrastructure decouples IT operations and research software development.
 
-<!-- things what use openstack -->
-The NSF-funded Jetstream2 project is a cloud computing environment available to researchers through the NSF ACCESS program [@Hancock2021; @Boerner2023].
-The NSF ACCESS program is the successor to the XSEDE program which nurtured the development of national HPC resources to support research workflows @Towns2014.
-Jetstream2 is built using OpenStack and provides cloud-native abstractions to  research applications that need compute, storage, and network resources.
-Jetstream2 allocates capacity for CPU, GPU, and storage using ACCESS-granted service unit credits.
-Jetstream2 demonstrates at-scale operations of OpenStack clouds and provides autonomous access to advanced hardware for the development of research workflows.
+The NSF-funded Jetstream2 project, a cloud computing environment and NSF ACCESS resource, offers compute resources to researchers via OpenStack [@Hancock2021; @Boerner2023].
+The NSF ACCESS program succeeds the XSEDE program, which nurtured development of national HPC resources in support of research workflows @Towns2014.
+Compute and storage resources, allocated to researchers with ACCESS-granted service unit credits, are provided by cloud-native abstractions layered on top of OpenStack.
+Jetstream2 demonstrates at-scale operations of OpenStack clouds and furnishes autonomous access to advanced hardware for the development of research workflows.
 
-CRI\_XCBC is a legacy software project created by the XSEDE program.
-It provides a working example of a deployable, extensible HPC stack that used Ansible playbooks to deploy an OpenHPC defined cluster infrastructure @CRIXCBC2024.
-We maintain a site-specific fork of CRI\_XCBC that serves as our foundation for software defined cluster environments @Robinson2025.
-We extended this code-base to include OOD web services as part of the Ansible-deployed OpenHPC cluster @Tripathi2020.
+CRI\_XCBC exemplifies deployable, extensible HPC stacks. A legacy software project of the XSEDE program, CRI\_XCBC uses Ansible playbooks to deploy an OpenHPC-defined cluster infrastructure @CRIXCBC2024.
+We maintain a site-specific fork serving as our foundation for software defined HPC cluster environments @Robinson2025.
+The fork has been extended with Ansible-deployed OOD web services @Tripathi2020.
 We further extend this Ansible code-base to support SDHPC in this work.
 
 The "data center as a computer" model facilitates systems development, abstracting complex subsystems as the component in a personal computer @Barroso2019.
 Compute resources, both HPC and cloud, form the central processing unit (CPU).
 Compute-adjacent storage, such as block devices and parallel network file storage, is system memory.
-Object storage is hard drives, and the internal networks are mainboard traces and cables.
+Object storage are the hard drives, and the internal networks are mainboard chips, traces, and cables.
 These abstractions guide organization of multi-site and multi-system infrastructure deployments.
-Additionally, the model is easier to reason about, improving stakeholder communication and strategizing.
+Additionally, the model is easy to reason about, improving stakeholder communication and strategizing.
 
 (sdhpc)=
 # Software Defined HPC
