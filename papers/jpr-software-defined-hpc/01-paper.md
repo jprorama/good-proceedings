@@ -266,74 +266,71 @@ The deploy steps focus on customization to meet the needs of specific environmen
 (sdhpc-applied)=
 # SDHPC for Data and Cluster Migration
 
-The SDHPC framework provides features that enable a variety of service operation and development scenarios.
+The SDHPC framework provides features enabling a variety of service operation and development scenarios.
 We introduced SDHPC to maintain stable HTTP and SSH endpoint definitions for users during a multi-phase migration of the HPC services in our RCS.
 
 ```{figure} images/AB_cluster.png
 :label: ab_cluster
 :width: 100%
-:alt: Schematic showing boxes representing the application routers for HTTP and SSH at the top of the image with lines pointing to additional boxes below that represent the login and OOD nodes of distinct clusters A and B.
+:alt: Schematic diagram showing connections between application routers (top) and the OOD and login nodes (middle) of two distinct clusters (bottom).
 
-An arrangement of the Software Defined HPC (SDHPC) framework to route users to distinct cluster environments based on their user identity and group membership. Group A web and ssh connections are routed to the login and OOD nodes of Cluster A and group B connections are routed to the login and OOD nodes of Cluster B.
+In the arrangement of Software Defined HPC (SDHPC) shown, user routes are established between application routers (top) and login and OOD nodes (middle). Group A web and ssh connections are routed to the login and OOD nodes (middle-left), respectively, of Cluster A (bottom-left). Likewise for group B and Cluster B (right).
 ```
 
-The SDHPC framework was developed in response to a confluence of events.
-We were faced with vendor landscape changes, product licensing changes, product lifecycle transitions, data center power constraints, storage demand growth, and the general financial constraint of operating within annual budget cycles.
+Our SDHPC framework was developed in response to a confluence of events.
+In addition to vendor, product license, and product lifecycle challenges, we faced power constraints, increasing storage demand, and financial constraints.
 
-The GPFS high-performance storage for the HPC service needed to be upgraded to the latest supported version.
+The GPFS parallel storage for our HPC system required a version upgrade to ensure support continuity.
 Changes in the vendor landscape required moving petabytes of data to a new GPFS implementation from a new vendor @Sedlmayer2020.
-Product license changes lead to a GPFS implementation that transparently moves inactive files to a capacity tier implemented with Cephfs @carlz-at-us.ibm.com2020.
-This cost-effective design uses GPFS to provide a unified file namespace for HPC applications, maximizing performance for active analyses and capacity for file retention.
+Product license changes led us to develop a cost-effective storage system that transparently moves inactive files from the GPFS performance tier to a capacity tier implemented with CephFS @carlz-at-us.ibm.com2020.
+Our implementation presents users with a unified file namespace for HPC applications, maximizing performance for active analyses with GPFS, and capacity for file retention with CephFS.
 
-Power constraints within the on-campus data center drove decisions to consolidate all RCS compute services in newly available high-powered racks at a nearby commercial data center @DcbloxHDcolo.
-The compute services include the HPC batch compute cluster and its associated GPFS performance tier, the VM cloud platform, and the process container platform.
+Power constraints within the on-campus data center drove decisions to consolidate all RCS compute services in newly-available, high-power racks at a nearby commercial data center @DcbloxHDcolo.
+Consolidated compute services include the HPC batch compute cluster and its associated GPFS performance tier, the VM cloud platform, and the container platform.
 The new facility provides sufficient power for planned growth of all RCS compute capacity.
 The facility is integrated with the on-campus data center using dark fiber provided by the University of Alabama System Regional Optical Network (UASRON).
-This configuration allows the on campus data center to continue hosting less power-dense Ceph capacity storage services and to provide the peering points for campus and R&D networks.
+This configuration allows the on-campus data center to continue hosting less power-dense Ceph capacity storage services and to provide peering points for campus and R&D networks.
 
 The SDHPC framework helps navigate complex requirements.
 [Figure %s](#ab_cluster) highlights the HPC storage and data center migration use-case that drove its development.
-Implementing the migration required reconstructing the HPC service in the new data center facility.
-In order to avoid extended downtime for the entire HPC community, we planned the data migration around moving isolated subsets of users in batches across the storage systems.
+Implementing the migration required complete reconstruction of our HPC infrastructure in the new data center facility.
+To avoid extended downtime for our entire user community, we planned the data migration around moving isolated subsets of users in batches across the storage systems.
 We planned the compute migration by staging an initial footprint of HPC compute capacity as a separate cluster attached to the new GPFS platform in the new facility.
 
-We designate Cluster A in #fig:ab_cluster as the HPC resources associate with the original storage platform and Cluster B as the HPC resources associate with the new storage platform.
-This provides distinct environments onto which users can be mapped depending on their data migration status reflected by membership in group A or group B.
-This approach allows moving users and HPC capacity as individual data migrations are completed.
-This incremental migration also provided a natural load-testing ramp for the new storage solution.
+We designate Cluster A in #fig:ab_cluster as the HPC resources associate with the original storage platform and Cluster B the resources associated with the new storage platform.
+This provides distinct environments onto which users can be mapped depending on their data migration status, reflected by membership in group A or group B.
+This split cluster approach allows moving users and HPC capacity as batches of data are migrated.
+This incremental migration provides a natural load-testing ramp for the new storage solution.
 
 The SDHPC HTTP and SSH application routers provide stable endpoints for all users, regardless of their migration status.
 Moving a user is accomplished by changing the group membership of their account from group A to group B.
-This group membership directs their connections to cluster A or cluster B, respectfully, depending on the location of their data.
-The assignments are transparent to the end user.
+This group membership directs their connections to cluster A or cluster B, respectively, depending on the location of their data.
+Group and Cluster ressignment is transparent to the user.
 
 To further simplify the user experience, we provide the same file system namespace and scheduler partitions in both cluster environments.
 The file system namespace is made consistent across cluster environment by using appropriate bind mounts.
-The job submission experience is made consistent by using the SLURM job submit plugin to route user jobs to the correct cluster compute nodes that are connected to the storage platform housing their data.
-The same group memberships directing user connections are use to modify submitted jobs, tagging them with a feature to select appropriate nodes within a requested partition.
+The job submission experience is made consistent by using the SLURM job submit plugin to route user jobs to compute nodes connected to the storage platform housing their data.
+The same group memberships directing user connections are used to modify submitted jobs, tagging them with a feature to select appropriate nodes within a requested partition, allowing a single point of control.
 
-Keeping the user experience consistent during this transition minimizes the cognitive load on users by avoiding changes to their HPC workflows.
-The migration workflow seeds user data to the new storage system with regular synchronization runs using dsync from mpiFileUtils @osti_mpifileutils.
-When a user's migration from Cluster A to Cluster B is scheduled, their account is place on hold to avoid changes to their data.
-A final sync from the source system is performed to capture any changes since the most recent seed point.
-Their file namespace is stubbed into the new GPFS performance tier from the Cephfs capacity tier.
-Their cluster assignment group is updated and their account hold is released.
-From then on, their group B membership ensures their HTTP and SSH connections are routed to Cluster B.
+Keeping the user experience consistent during this transition minimizes user cognitive load, avoiding changes to their HPC workflows.
+Our data migration workflow seeds user data to the CephFS capacity tier on the new storage system, with regular update syncs, using the dsync application from mpiFileUtils @osti_mpifileutils.
+When a user's migration from Cluster A to Cluster B is scheduled, their account is placed in the "account\_hold" state to avoid changes while data is in-flight.
+A final sync from the source system captures changes since the most recent seed point.
+The user's file namespace is stubbed into the new GPFS performance tier from the CephFS capacity tier.
+After a final data validation, the user's state change is unwound and they are placed in group B, ensuring subsequent HTTP and SSH connections are routed to Cluster B.
 Each migrated user effectively experiences a blue-green deployment model [@Fowler2010; @Humble2013].
-The user is cut over to the new production system when it is validated as operational for their account.
 
-The RCS cloud service provides an ideal hosting environment for production SDHPC services.
-We provision the application routers and cluster B's OOD node to an OpenStack project dedicated to HPC production operations.
-The project is authorized to access campus and cluster provider networks made available to the project through the OpenStack software defined networking (SDN) services.
-This allows the application routers to accept user connections and route them to the appropriate cluster.
-Furthermore, this virtual infrastructure helps frame the functionality of application routers as traffic flow control agents for HPC connections.
+The RCS OpenStack cloud service provides an ideal hosting environment for production SDHPC services.
+We provision application routers and cluster B's OOD node to an OpenStack project dedicated to HPC production operations.
+The project is authorized to access campus and cluster provider networks, made available to the project through the OpenStack software defined networking (SDN) services.
+SDN services enable the application routers to accept user connections and route them to the appropriate cluster.
+Furthermore, the virtual infrastructure helps frame the functionality of application routers as traffic flow control agents for HPC connections.
 
-The RCS cloud service is also a natural fit for CICD driven workflows.
+The RCS cloud service is also a natural fit for CICD-driven workflows.
 Developer contributions to the image factory can be validated with integration pipelines.
 New releases are delivered to production using the same pipelines used in development.
-This cloud-native software development workflow enables rapid feature iteration during product development cycles and reduces the friction between development and production deployments.
-Deployment of testable integration environments takes only a few minutes.
-These rapid deployments lower testing barriers, increase test frequency, and lead to enhanced service quality.
+This cloud-native software development workflow enables rapid feature iteration during product development cycles and reduces friction between development and production deployments.
+Deployment of testable integration environments takes only a few minutes, reducing test barriers and increasing test frequency, leading to enhanced service quality.
 
 (ssh-router-perf)=
 # SSH Application Router Performance
