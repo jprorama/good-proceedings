@@ -242,25 +242,23 @@ With the routers and account states in place, our HPC system remains available o
 ## CICD Pipelines
 
 SSH and HTTP application routers direct user traffic to login nodes, OOD instances, and the account app according to site operational goals.
-This creates a coherent user experience for HPC access that is consistent across both HTTP and SSH endpoints.
+Routing creates a coherent user experience for HPC access that is consistent across both HTTP and SSH endpoints.
 Implementing these services as Infrastructure as Code (IaC) allows continuous development of platform features and control over the introduction of capabilities as they are deployed @Ramos2015.
 
-Our CICD workflows are built using GitLab CI/CD @gitlab-cicd.
+Our CICD workflows are built using GitLab CICD within a self-hosted, on-premises GitLab server @gitlab-cicd.
 We use a dedicated GitLab repository to house the CICD pipelines, following the image factory pattern @Muse2023.
 We created CICD pipelines with separate build and deploy phases @uabrc2025.
 Both phases leverage Ansible to construct relevant artifacts.
 The RCS cloud subsystem provides the infrastructure for development, build, and deployment workflows.
-This enables the construction of comprehensive cloud-native application construction workflows and facilitates tight integration with campus HPC resources via direct connection to relevant provider networks.
+This enables the construction of comprehensive cloud-native application construction workflows and facilitates tight integration with HPC resources via direct connection to relevant provider networks.
 
-Packer templates are used to construct VM images for the proxies, OOD and account app during the build phase @HashiCorpPacker2025.
-These templates include extensions to interface with the OpenStack API available in RCS.
-Additional modules readily work with other cloud providers, ensuring workflow portability.
-We execute daily builds of our OOD image.
-This ensures image construction remains viable and surfaces problems with build dependencies in a timely fashion.
-The daily builds also support nightly deploys to review OOD feature improvements and bug fixes against our production HPC system.
+Packer templates are used to construct VM images for the proxies, OOD, and account app during the build phase @HashiCorpPacker2025.
+These templates include extensions which allow interfacing with the OpenStack API available in RCS, and additional modules readily work with other cloud providers, ensuring workflow portability.
+To ensure image construction remains viable and to surface problems with build dependencies in a timely fashion, we execute daily OOD image builds.
+The daily builds support nightly deploys, enabling us to review OOD feature improvements and bug fixes against our production HPC system.
 
 For the deployment pipelines, we choose to directly invoke OpenStack CLI commands for implementation convenience.
-We have used Terraform for the deploy phase of other system components not featured in this work and plan to migrate SDHPC artifact deployment to Terraform in the future @HashiCorpTerraform2025.
+We have used Terraform for the deploy phase of other system components (not featured in this work) and plan to migrate SDHPC artifact deployment to Terraform in the future @HashiCorpTerraform2025.
 
 The separation of build and deploy steps enables us to construct versioned VM binaries that can be used across development, test, and production environments.
 The deploy steps focus on customization to meet the needs of specific environments, providing late-binding hooks for integration with dev, test, and prod clusters.
