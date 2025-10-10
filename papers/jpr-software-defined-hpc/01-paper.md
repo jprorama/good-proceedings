@@ -125,7 +125,7 @@ Deploying OpenStack for research infrastructure decouples IT operations and rese
 
 The NSF-funded Jetstream2 project, a cloud computing environment and NSF ACCESS resource, offers compute resources to researchers via OpenStack [@Hancock2021; @Boerner2023].
 The NSF ACCESS program succeeds the XSEDE program, which nurtured development of national HPC resources in support of research workflows @Towns2014.
-Compute and storage resources, allocated to researchers with ACCESS-granted service unit credits, are provided by cloud-native abstractions layered on top of OpenStack.
+Compute and storage resources, allocated to researchers with ACCESS-granted service unit credits, are provided by the cloud-native resource abstractions of OpenStack.
 Jetstream2 demonstrates at-scale operations of OpenStack clouds and furnishes autonomous access to advanced hardware for the development of research workflows.
 
 CRI\_XCBC exemplifies deployable, extensible HPC stacks. A legacy software project of the XSEDE program, CRI\_XCBC uses Ansible playbooks to deploy an OpenHPC-defined cluster infrastructure @CRIXCBC2024.
@@ -215,12 +215,13 @@ To accomplish rule-based SSH routing based on user identity, we implemented an S
 We contributed an enhancement to sshpiper which allows a user's group membership to be considered in its routing rules.
 
 The SSH application router enables routing to preferred login nodes based on site policy or other operational requirements.
-With sshpiper, routing works by terminating the client-side SSH connection and establishing a secondary, internal SSH connection to the desired login node endpoint.
-For password-based authentication, the user's credentials are passed to, and validated by, the login node endpoint.
-Key-based authentication is managed using internal cluster keys shared via the file system, using the same infrastructure already in place on the HPC system.
+With sshpiper, routing works by daisy-chaining two SSH connections.
+The first connection is terminated at application router from the client side, and the second connection is established from the application router to the desired login node.
+For password-based authentication, the user's credentials are passed to, and validated by, the login node endpoint by the secondary connection.
+Key-based authentication is accomplished by using a separate internal SSH key to authenticate the secondary connection to the login node.
 HPC systems typically allow users transparent access to compute nodes running their jobs without prompting for additional authentication.
-We replicate this behavior by creating an SSH keypair as part of our account creation process, and automatically add it to the user's authorized-keys file.
-We use this existing HPC infrastructure to facilitate sshpiper operations.
+They implement this behavior by creating account-specific SSH keypairs as part of the account creation process, automatically adding the keys to the user's authorized-keys file.
+We leverage this existing HPC infrastructure to facilitate sshpiper operation by accessing the user's SSH configuration via the shared file system.
 
 To align with the self-directed nature of cloud-native platforms, we previously built a web app for self-directed account creation and management.
 When attempting to authenticate to OOD, users without HPC accounts are redirected to the account app.
@@ -228,7 +229,7 @@ If authorized, the app prompts users to create an account, otherwise informs the
 After an authorized user submits their account creation request, the app interacts with standard HPC account creation services, exposed via a RabbitMQ message bus.
 When the account is created, the user's web connection is redirected to OOD, allowing the user to begin HPC on-boarding.
 The account creation request typically takes less than fifteen seconds to complete.
-This capability ensures authorized users experience little more than a slight account provisioning delay the first time the access the HPC system.
+This capability ensures authorized users experience little more than a slight account provisioning delay the first time they access the HPC system.
 
 We define a basic set of account states like "good\_standing", "certification\_required", and "account\_hold" to facilitate operations.
 Only users with accounts in "good\_standing" are allowed to interact with the HPC system via OOD or SSH.
@@ -278,7 +279,7 @@ In the arrangement of Software Defined HPC (SDHPC) shown, user routes are establ
 ```
 
 Our SDHPC framework was developed in response to a confluence of events.
-In addition to vendor, product license, and product lifecycle challenges, we faced power constraints, increasing storage demand, and financial constraints.
+In addition to vendor, product license, and product lifecycle challenges, we faced power constraints, increasing storage demand, and the limits of annual budget allocations.
 
 The GPFS parallel storage for our HPC system required a version upgrade to ensure support continuity.
 Changes in the vendor landscape required moving petabytes of data to a new GPFS implementation from a new vendor @Sedlmayer2020.
@@ -289,7 +290,7 @@ Power constraints within the on-campus data center drove decisions to consolidat
 Consolidated compute services include the HPC batch compute cluster and its associated GPFS performance tier, the VM cloud platform, and the container platform.
 The new facility provides sufficient power for planned growth of all RCS compute capacity.
 The facility is integrated with the on-campus data center using dark fiber provided by the University of Alabama System Regional Optical Network (UASRON).
-This configuration allows the on-campus data center to continue hosting less power-dense Ceph capacity storage services and to provide peering points for campus and R&D networks.
+This configuration allows the on-campus data center to continue hosting less power-dense Ceph capacity storage services and to provide peering points for campus and regional networks.
 
 The SDHPC framework helps navigate complex requirements.
 [Figure %s](#ab_cluster) highlights the HPC storage and data center migration use-case that drove its development.
@@ -385,11 +386,11 @@ This suggests stable performance for interactive command-line use.
 Although the sshpiper-based application router has lower throughput, we considered the stable performance ideal for interactive use.
 We also consider the throughput acceptable for less demanding data transfer workloads.
 We offer high-speed data transfer via Globus endpoints for demanding workloads.
-While Scenario E shows that SSH application routing only achieves two-thirds the throughput over the un-routed Scenario B, the tests indicate this is most likely a result of the pipelined SSH connection rather than a limitation of sshpiper itself.
+While Scenario E shows that SSH application routing only achieves two-thirds the throughput over the un-routed Scenario B, the tests indicate this is most likely a result of the daisy-chained SSH connection rather than a limitation of sshpiper itself.
 Crucially, sshpiper is the only scenario that supports per-user routing of SSH connections based on account attributes.
 
 A more detailed study of SSH application router performance is warranted.
-It will be informative to understand the origin of performance impacts from pipelined SSH connections.
+It will be informative to understand the origin of performance impacts from daisy-chained SSH connections.
 The sshpiper application router performance is not significantly below traditional SSH jumphost proxy scenarios in the same deployment scenarios and could likely be improved with conventional performance tuning, e.g. using physical hardware instead of VMs.
 Nonetheless, we can envision the deployment of highly scalable environments given the SDHPC SSH application routing functionality.
 
@@ -400,11 +401,11 @@ The SSH and HTTP application routing features of SDHPC facilitate the creation o
 Policy-based routing of user workloads maintains service availability in the face of significant changes to underlying infrastructure.
 SDHPC simplified data migration for a major storage upgrade and will support future improvements to the HPC service in RCS.
 Using cloud-native development paradigms and CICD pipelines for SDHPC operations also improves service reliability by simplifying feature testing and reducing the length of development cycles.
-Providing stable interfaces that support controlled introduction of platform features and infrastructure operations is the goal of cloud-native platforms.
+Providing stable interfaces that support controlled introduction of platform features and infrastructure improvements is the goal of cloud-native platforms.
 Nonetheless, work remains to minimize impacts on data transfer performance when routing SSH connections.
 
 We are expanding our use of the image factory model to simplify introduction of new HPC services and reduce maintenance overhead.
-Creating consistent CICD workflows for development and production.
+Creating consistent CICD workflows for development and production increases feature contribution opportunities.
 IaC demands programmatic control over infrastructure.
 Automated construction of systems improves their reliability.
 Moving service construction to a cloud-native model ensures IaC tested during development remains valid for production.
