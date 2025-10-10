@@ -34,6 +34,7 @@ authors:
   - name: Krish Moodbidri
     affiliations:
             - University of Alabama at Birmingham, IT Research Computing
+    orcid: 0009-0009-6545-9377
     roles:
       - Software
       - Validation
