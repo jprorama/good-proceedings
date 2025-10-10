@@ -342,17 +342,17 @@ As such, SDHPC HTTP application router performance did not present any concerns 
 Instead, we chose to align the HTTP application router configuration with VM sizing recommendations provided in the OOD documentation.
 In order to understand impacts on SSH performance, however, we measured data transfer throughput for a variety of SSH connection scenarios with and without the use of the sshpiper application router.
 
-:::{table} SSH Throughput Tests. All values in Megabytes per second. Results of SCP transfers of a 2 Gigabyte file to destination hosts, averaged over thirty tests.
+:::{table} SSH Throughput Tests. Timed SCP transfers of a 2 Gigabyte file (base-ten) to destination hosts, averaged over thirty tests.
 :label: table-sshperf
 :align: center
 
-| Scenario | SCP Target              | Mean   | Error Margin | Confidence       |
-|----------|-------------------------|--------|--------------|------------------|
-| A        | Project VM              | 369.33 | 7.92         | 361.42 -- 377.25 |
-| B        | Login node              | 119.80 | 7.11         | 112.69 -- 126.92 |
-| C        | Proxy via physical node | 98.45  | 4.81         | 93.64 -- 103.26  |
-| D        | Proxy via Project VM    | 84.44  | 5.32         | 79.13 -- 89.76   |
-| E        | Proxy via sshpiper      | 81.47  | 1.52         | 79.95 -- 82.99   |
+| Scenario | SCP Target              | Mean Time (s) | Error Margin | Mean Rate (MB/s) |
+|----------|-------------------------|---------------|--------------|------------------|
+| A        | Project VM              | 5.43          | 0.12         | 368.13           |
+| B        | Login node              | 17.11         | 1.02         | 116.91           |
+| C        | Proxy via physical node | 20.67         | 1.06         | 96.76            |
+| D        | Proxy via Project VM    | 24.34         | 1.53         | 82.17            |
+| E        | Proxy via sshpiper      | 24.61         | 0.44         | 81.28            |
 :::
 
 In [](#table-sshperf) we show the throughput of SSH data transfers using SCP to copy a two Gigabyte file (base-ten) to a target node.
@@ -361,7 +361,7 @@ All SSH components, except for the sshpiper application router, are implemented 
 The results represent the performance of wired clients in different scenarios.
 In scenario A the originating VM is used to transfer data to a VM local to the OpenStack project used for testing.
 This provides an overall control for expected maximum SSH performance achievable by the originating VM.
-We do not expect to replicate this performance in other scenarios because all other tests are bound by the performance of the network throughput to the HPC login node, 10Gbps in the current environment.
+We do not expect to replicate this performance in other scenarios because all other tests are bound by the performance of the throughput to the HPC login node.
 Scenario B serves as control for SSH performance to the production interface of the existing HPC login node.
 Ideally, the performance of the remaining scenarios would closely match this control.
 
@@ -369,10 +369,10 @@ The remaining scenarios each represent different SSH proxy configurations, all o
 These scenarios are most comparable to our SDHPC SSH application routing, capturing the impact of double SSH connection.
 
 Scenario C is a standard SSH jump host configuration where an SSH connection is established to the jump host, and a second SSH connection is established from client to login node through the jump host.
-With this configuration, we avoid all possible hypervisor and SDN overhead, giving us a basis for comparison with subsequent scenarios.
+With this configuration, we avoid all potential hypervisor and SDN overhead on the application router, giving us a basis for comparison with subsequent scenarios.
 We used the production login node as the jump host and a cluster compute node as stand-in for a physical login node accessed via proxy.
 This SSH path mirrors the cluster topology supporting sshpiper, a front end SSH target directly connected "within" the cluster to a target login node.
-From the data, we see that the introduction of the second SSH connection decreased throughput by about 18% compared with scenario B, suggesting introduction of SSH application routing will impact real-world throughput.
+From the data, we see that the introduction of the second SSH connection decreased throughput by about 17% compared with scenario B, suggesting introduction of SSH application routing will impact real-world throughput.
 
 Scenario D represents the same SSH jump host configuration as scenario C, but replaces the physical front-end node with a VM running in the same OpenStack project.
 This matches the intended cloud-native deployment for our SDHPC SSH application router but without introduction of the new Golang-base SSH implementation in sshpiper.
@@ -380,8 +380,9 @@ This configuration introduces a 30% drop in performance compared with scenario B
 
 Finally, Scenario E represents the planned production sshpiper deployment of the SDHPC SSH application router.
 This allows us to understand the performance of the Golang SSH package leveraged by sshpiper to provide the SSH proxy functionality.
-Comparing scenario E to D, we observe a slight decrease in throughput, giving a 32% drop compared with scenario B.
-The sshpiper SSH application router, however, enjoys a significant reduction in the error margin over all other scenarios. <!-- see my comments in slack -->
+Comparing scenario E to D, we observe a slight decrease in throughput, but remain close to the 30% drop compared with scenario B.
+This suggests VM-based application routing potentially incurs additional overhead from the virtualized infrastructure.
+The sshpiper SSH application router, however, enjoys a significant reduction in the error margin over all other scenarios.
 This suggests stable performance for interactive command-line use.
 Although the sshpiper-based application router has lower throughput, we considered the stable performance ideal for interactive use.
 We also consider the throughput acceptable for less demanding data transfer workloads.
