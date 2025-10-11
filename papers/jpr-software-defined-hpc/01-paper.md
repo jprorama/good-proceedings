@@ -164,13 +164,18 @@ RCS delivers compute, storage, and networking services to research applications.
 :label: rcs_architecture
 :alt: Network graph diagram of RCS architecture made of a collection of boxes, each containing text, connected by lines.
 
-RCS architecture follows warehouse-scale computer design. Batch HPC, virtual machine (VM), and container compute modalities (top) are all connected to an L3 ethernet and infiniband interconnect (center). The interconnect links to a parallel file system (FS) and to multi-modal storage with FS, block, and object modalities (memory and HDD, bottom). The interconnect also provides peering to external networks (bottom).
+RCS architecture follows warehouse-scale computer design. Batch HPC, virtual machine (VM), and container compute modalities (top) are all connected to an L3 Ethernet interconnect with a low-latency InfiniBand fabric added for HPC workloads (center). The interconnect links provide access to a parallel file systems (FS) and to multi-modal storage with FS, block, and object modalities (bottom). The interconnect also provides peering to external networks (bottom).
 ```
 
 RCS compute services provide batch HPC, virtual machine (VM), and container modalities.
 Compute services leverage storage services that provide parallel file systems, block devices, and object storage from pools of commodity storage hardware.
 Compute and storage services are interconnected by networks that provide bandwidth for both east-west and north-south traffic flows.
 RCS peers with external networks, providing access from campus and external Research and Education networks via a Science DMZ (SciDMZ) segment @Dart2013.
+
+The "data center as a computer" model allows conceptualizing these RCS sevices as componenets of a simplified, abstact computer design.
+The various compute services represent the CPU, the interconnects represent the component connectivity of the mainboard, the storage services directly map to a variety of persistent storage devices, and the edge networks represent the computer's network interfaces.
+While not a literal mapping for application design, the model simplifies comprehension of the complex clusters that implment each of these services.
+This model also simplifies reasoning about the function of RCS services, their architectural arrangement, and helps focus conversations on service improvements.
 
 HPC batch computing is implemented via a traditional, physical cluster of compute nodes.
 At our site, the HPC cluster is deployed using Base Command Manager (BCM), formerly Bright Cluster Manager.
@@ -186,9 +191,11 @@ Today, SDHPC exclusively uses the VM and batch subsystems.
 Work remains to leverage microservice architectures in SDHPC.
 
 Our implementation of RCS provides two storage subsystems: GPFS and Ceph.
-GPFS serves as parallel storage for HPC workloads, while Ceph delivers block and object storage services to OpenStack and Kubernetes based workloads.
-Public S3 endpoints are available for user data through Ceph object storage, and CephFS serves as a capacity tier backend for GPFS to help manage storage costs.
-Research and Education network peering is provided by a SciDMZ segment that uses Globus as data transfer interface for GPFS.
+GPFS is accessible via InfiniBand as performant parallel storage for HPC workloads.
+Ceph delivers block and object cloud-native storage services to OpenStack and Kubernetes based workloads.
+Public S3 endpoints are available for user data through a Ceph object storage.
+Additionally, CephFS serves as a capacity tier backend for GPFS to help manage storage costs.
+Research and Education network peering is provided by a SciDMZ segment that uses Globus as a data transfer interface for GPFS.
 Globus allows users to manage other storage services via additional connectors @Chard2016.
 Campus peering provides network access to all services in the RCS, simplifying compliance with campus IT policies.
 Enhancements to RCS network interfacing are under consideration to expand services delivered via the SciDMZ.
