@@ -172,9 +172,9 @@ Compute services leverage storage services that provide parallel file systems, b
 Compute and storage services are interconnected by networks that provide bandwidth for both east-west and north-south traffic flows.
 RCS peers with external networks, providing access from campus and external Research and Education networks via a Science DMZ (SciDMZ) segment @Dart2013.
 
-The "data center as a computer" model allows conceptualizing these RCS sevices as componenets of a simplified, abstact computer design.
+The "data center as a computer" model allows conceptualizing these RCS services as components of a simplified, abstract computer design.
 The various compute services represent the CPU, the interconnects represent the component connectivity of the mainboard, the storage services directly map to a variety of persistent storage devices, and the edge networks represent the computer's network interfaces.
-While not a literal mapping for application design, the model simplifies comprehension of the complex clusters that implment each of these services.
+While not a literal mapping for application design, the model simplifies comprehension of the complex clusters that implement each of these services.
 This model also simplifies reasoning about the function of RCS services, their architectural arrangement, and helps focus conversations on service improvements.
 
 HPC batch computing is implemented via a traditional, physical cluster of compute nodes.
@@ -314,7 +314,7 @@ This incremental migration provides a natural load-testing ramp for the new stor
 The SDHPC HTTP and SSH application routers provide stable endpoints for all users, regardless of their migration status.
 Moving a user is accomplished by changing the group membership of their account from group A to group B.
 This group membership directs their connections to cluster A or cluster B, respectively, depending on the location of their data.
-Group and Cluster ressignment is transparent to the user.
+Group and Cluster reassignment is transparent to the user.
 
 To further simplify the user experience, we provide the same file system namespace and scheduler partitions in both cluster environments.
 The file system namespace is made consistent across cluster environment by using appropriate bind mounts.
