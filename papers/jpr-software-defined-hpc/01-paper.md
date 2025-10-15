@@ -56,7 +56,7 @@ abstract: |
 acknowledgments: |
   We extend our gratitude to several individuals who generously shared their expertise and helped us improve our understanding of tools leveraged in this work.
   Doug Johnson at the Ohio Supercomputer Center for sharing insights on approaches to large scale data migration.
-  John Michael Lowe and Jeremy Fischer at Indiana University for deep insight on Jetstream2 operations (engagement supported by NFS Awards 2005506 and 2227627).
+  John Michael Lowe and Jeremy Fischer at Indiana University for deep insight on Jetstream2 operations (engagement supported by NSF Awards 2005506 and 2227627).
   We appreciate their professional courtesy but accept all responsibility for the implementation choices and conclusions presented in this work.
 
 keywords:
@@ -75,7 +75,7 @@ The promise of scientific discovery drives the computing needs of researchers.
 Advances in research computing technology arise in response to those needs.
 Scientists must adapt to a competitive, rapidly-changing research landscape.
 As such, research computing staff must quickly adapt systems to changing requirements and improving technology, while minimizing impact to researcher operations.
-Traditional high-performance computing (HPC) infrastructure is defined by fixed services closely aligned with hardware layouts.
+Traditional high-performance computing (HPC) infrastructure is defined by fixed services closely aligned with cluster deployments.
 In contrast, a software defined infrastructure for high-performance computing (SDHPC) is responsive and flexible, enabling in-flight upgrades with reduced researcher impact.
 
 Traditional HPC use centered on text-based, command-line interactions where users connect via SSH to dedicated login nodes to execute batch-oriented research workflows @Lonvick2006.
@@ -91,14 +91,14 @@ Implementation details, such as submitting a job script to the scheduler, are hi
 Because OOD hides these details, researchers can more readily incorporate HPC into their research workflows.
 
 OOD operates by mapping browser interactions to per-user web servers.
-When a user connects to the HPC system via HTTPS, the OOD server spawns a web server process running under their account identity, as defined on the HPC system.
+When a user connects to the HPC system via HTTP, the OOD server spawns a web server process running under their account identity, as defined on the HPC system.
 Whenever the user executes actions on the web site, processes started by the web server run within their identity context.
 The net effect is that user engagement with the HPC system is shepherded by software definitions—identity, operating system rules, OOD application definitions, and the scheduler.
 User interaction via OOD is governed by the same permissions enforced by the operating system on all the user's processes, whether started trough OOD or traditional command-line accessed via SSH.
 
 OOD transforms HPC user engagement into a web-native experience.
 SDHPC transforms the HPC system itself into a cloud-native application.
-Application routers for SSH and HTTPS enable us to modify the HPC environment for arbitrary subsets of the user community.
+Application routers for SSH and HTTP enable us to modify the HPC environment for arbitrary subsets of the user community.
 This identity-based routing requires that the application routers authenticate users in order to direct their connections to the correct resources.
 Web authentication is handled by a web single sign-on (SSO) enabled Apache reverse-proxy routing users based on group membership.
 SSH authentication and routing is handled by sshpiper, an open-source SSH proxy built on top of the Golang SSH package @Lian2025.
@@ -134,10 +134,13 @@ We maintain a site-specific fork serving as our foundation for software defined 
 The fork has been extended with Ansible-deployed OOD web services @Tripathi2020.
 We further extend this Ansible code-base to support SDHPC in this work.
 
-The "data center as a computer" model facilitates systems development, abstracting complex subsystems as the component in a personal computer @Barroso2019.
+The "data center as a computer" model facilitates systems development, abstracting complex subsystems as the components in a personal computer @Barroso2019.
+<!-- this section should likely give way to the later RCS interpretation. 
+we should focus on the contribution of warehouse scale computing here -->
 Compute resources, both HPC and cloud, form the central processing unit (CPU).
-Compute-adjacent storage, such as block devices and parallel network file storage, is system memory.
-Object storage are the hard drives, and the internal networks are mainboard chips, traces, and cables.
+Compute-adjacent storage, such parallel network file storage, cache data for performance.
+Multi-modal storage, like block and object, persist data, and the internal networks are mainboard chips, traces, and cables.
+<!--- end save for later -->
 These abstractions guide organization of multi-site and multi-system infrastructure deployments.
 Additionally, the model is easy to reason about, improving stakeholder communication and strategizing.
 
@@ -173,9 +176,10 @@ Compute and storage services are interconnected by networks that provide bandwid
 RCS peers with external networks, providing access from campus and external Research and Education networks via a Science DMZ (SciDMZ) segment @Dart2013.
 
 The "data center as a computer" model allows conceptualizing these RCS services as components of a simplified, abstract computer design.
-The various compute services represent the CPU, the interconnects represent the component connectivity of the mainboard, the storage services directly map to a variety of persistent storage devices, and the edge networks represent the computer's network interfaces.
+The various compute services represent the CPU, the interconnects represent the component connectivity of the mainboard, the storage services map to a variety of performance caches and persistent storage devices, and the edge networks represent the computer's network interfaces.
 While not a literal mapping for application design, the model simplifies comprehension of the complex clusters that implement each of these services.
-This model also simplifies reasoning about the function of RCS services, their architectural arrangement, and helps focus conversations on service improvements.
+This model also simplifies reasoning about the function of RCS services and their architectural arrangement.
+The RCS helps focus stakeholder communication and strategizing service improvement.
 
 HPC batch computing is implemented via a traditional, physical cluster of compute nodes.
 At our site, the HPC cluster is deployed using Base Command Manager (BCM), formerly Bright Cluster Manager.
@@ -207,13 +211,13 @@ OOD elevates HPC to web-native experience.
 Our goal with SDHPC is to elevate HPC to a cloud-native experience for system users and operators.
 Achieving this goal requires full control over all aspects of user interaction with the HPC platform.
 Routing users to appropriate services based on their identity is crucial to ensuring a consistent experience.
-We built application routers for HTTPS and SSH connections.
-To that end, we built application routers capable of directing user HTTPS and SSH connections to specific endpoints based on identity and account status.
+We built application routers for HTTP and SSH connections.
+To that end, we built application routers capable of directing user HTTP and SSH connections to specific endpoints based on identity and account status.
 
-Routing HTTPS connections is standard fare for web-native applications.
-We built a dedicated front-end HTTPS application router that directs users to an OOD instance based on their group membership.
-The HTTPS router acts as a reverse proxy, authenticating users via web SSO and routing their connection to the appropriate endpoint.
-Our HTTPS router requirements were readily satisfied with standard Apache reverse-proxy and web SSO modules.
+Routing HTTP connections is standard fare for web-native applications.
+We built a dedicated front-end HTTP application router that directs users to an OOD instance based on their group membership.
+The HTTP router acts as a reverse proxy, authenticating users via web SSO and routing their connection to the appropriate endpoint.
+Our HTTP router requirements were readily satisfied with standard Apache reverse-proxy and web SSO modules.
 We leverage user account attributes to make routing decisions.
 
 In practice, SSH connection routing is less common, and routing SSH connections based on user identity introduces special considerations.
@@ -267,7 +271,7 @@ To ensure image construction remains viable and to surface problems with build d
 The daily builds support nightly deploys, enabling us to review OOD feature improvements and bug fixes against our production HPC system.
 
 For the deployment pipelines, we choose to directly invoke OpenStack CLI commands for implementation convenience.
-We have used Terraform for the deploy phase of other system components (not featured in this work) and plan to migrate SDHPC artifact deployment to Terraform in the future @HashiCorpTerraform2025.
+We have used Terraform for the deploy phase of other system components (not featured in this work) and plan to migrate SDHPC artifact deployment to Terraform in the future [@Tripathi2020; @HashiCorpTerraform2025].
 
 The separation of build and deploy steps enables us to construct versioned VM binaries that can be used across development, test, and production environments.
 The deploy steps focus on customization to meet the needs of specific environments, providing late-binding hooks for integration with dev, test, and prod clusters.
@@ -346,8 +350,8 @@ Deployment of testable integration environments takes only a few minutes, reduci
 
 We considered the potential for performance impacts of SDHPC through the introduction of cloud-native (VM-based) application routers.
 HTTP reverse-proxies are a standard part of the OOD deployment and common for at-scale cloud deployments.
-As such, SDHPC HTTP application router performance did not present any concerns and was not explicitly studied.
 Instead, we chose to align the HTTP application router configuration with VM sizing recommendations provided in the OOD documentation.
+As such, SDHPC HTTP application router performance did not present any concerns and was not explicitly studied.
 In order to understand impacts on SSH performance, however, we measured data transfer throughput for a variety of SSH connection scenarios with and without the use of the sshpiper application router.
 
 :::{table} SSH Throughput Tests. Timed SCP transfers of a 2 Gigabyte file (base-ten) to destination hosts, averaged over thirty tests.
