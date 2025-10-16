@@ -124,12 +124,13 @@ OpenStack, an open source cloud computing platform, provides software defined co
 IT staff can guard access to the physical systems running OpenStack to ensure secure operations while democratizing access to resource abstractions that enable developers to build applications.
 Deploying OpenStack for research infrastructure decouples IT operations and research software development.
 
-The NSF-funded Jetstream2 project, a cloud computing environment and NSF ACCESS resource, offers compute resources to researchers via OpenStack [@Hancock2021; @Boerner2023].
+The Jetstream2 project, supported by the National Science Foundation (NSF), is a cloud computing environment and NSF ACCESS system that offers virtual machine (VM) and storage resources to researchers via an OpenStack-managed infrastructure [@Hancock2021; @Boerner2023].
 The NSF ACCESS program succeeds the XSEDE program, which nurtured development of national HPC resources in support of research workflows @Towns2014.
 Compute and storage resources, allocated to researchers with ACCESS-granted service unit credits, are provided by the cloud-native resource abstractions of OpenStack.
 Jetstream2 demonstrates at-scale operations of OpenStack clouds and furnishes autonomous access to advanced hardware for the development of research workflows.
 
-CRI\_XCBC exemplifies deployable, extensible HPC stacks. A legacy software project of the XSEDE program, CRI\_XCBC uses Ansible playbooks to deploy an OpenHPC-defined cluster infrastructure @CRIXCBC2024.
+CRI\_XCBC demonstrates extensible, software defined HPC stacks.
+A legacy software project of the XSEDE program, CRI\_XCBC uses Ansible playbooks to deploy an OpenHPC-based cluster infrastructure @CRIXCBC2024.
 We maintain a site-specific fork serving as our foundation for software defined HPC cluster environments @Robinson2025.
 The fork has been extended with Ansible-deployed OOD web services @Tripathi2020.
 We further extend this Ansible code-base to support SDHPC in this work.
@@ -138,14 +139,14 @@ The "data center as a computer" model facilitates systems development and operat
 WSCs enjoy economies of scale by combining fleets of systems into homogeneous platforms running a common set of provider workloads.
 WSCs abstract the compute, storage, and networking resources delivered to applications.
 These abstractions guide organization of multi-site and multi-system infrastructure deployments.
-The WSC model eases reasoning about system design and expansion.
+The WSC model eases reasoning about system design, operation, and expansion.
 
 (sdhpc)=
 # Software Defined HPC
 
 HPC clusters have long aligned with the principles of software defined infrastructure @Reed2014.
-The original Beowulf model deployed fleets of identical commodity compute nodes under the control of a head node that also supplied core infrastructure for HPC operations @Becker1999.
-Cloud infrastructure leverages these same approaches to provide scalable compute, storage, and network capacity @Lenk2009.
+The original Beowulf model deployed collections of identical commodity compute nodes under the control of a head node that also supplied core infrastructure for HPC operations @Becker1999.
+Cloud infrastructure extends this foundation to provide scalable compute, storage, and network capacity @Lenk2009.
 
 We adopted the "data center as a computer" model to align our research computing infrastructure with a coherent system architecture.
 The resulting platform serves as a target for SDHPC operations.
@@ -163,10 +164,10 @@ RCS delivers compute, storage, and networking services to research applications.
 :label: rcs_architecture
 :alt: Network graph diagram of RCS architecture made of a collection of boxes connected by lines. Each box contains text.
 
-RCS architecture follows warehouse-scale computer design. Batch HPC, virtual machine (VM), and container compute modalities (top) are all connected to an L3 Ethernet interconnect with a low-latency InfiniBand fabric added for HPC workloads (center). The interconnect links provide access to a parallel file systems (FS) and to multi-modal storage with FS, block, and object modalities (bottom). The interconnect also provides peering to external networks (bottom).
+RCS architecture follows warehouse-scale computer design. Batch HPC, virtual machine (VM), and container compute modalities (top) are all connected to an L3 Ethernet interconnect with a low-latency InfiniBand fabric added for HPC workloads (center). The interconnect provides access to a parallel file systems (FS) and to multi-modal storage with FS, block, and object modalities (bottom). The interconnect also provides peering to external networks (bottom).
 ```
 
-RCS compute services provide batch HPC, virtual machine (VM), and container modalities.
+RCS compute services provide batch HPC, VM, and container modalities.
 Compute services leverage storage services that provide parallel file systems, block devices, and object storage from pools of commodity storage hardware.
 Compute and storage services are interconnected by networks that provide bandwidth for both east-west and north-south traffic flows.
 RCS peers with external networks, providing access from campus and external Research and Education networks via a Science DMZ (SciDMZ) segment @Dart2013.
@@ -236,7 +237,7 @@ When attempting to authenticate to OOD, users without HPC accounts are redirecte
 If authorized, the app prompts users to create an account, otherwise informs them they are not authorized.
 After an authorized user submits their account creation request, the app interacts with standard HPC account creation services, exposed via a RabbitMQ message bus.
 When the account is created, the user's web connection is redirected to OOD, allowing the user to begin HPC on-boarding.
-The account creation request typically takes less than fifteen seconds to complete.
+The account creation request typically takes a few seconds to complete.
 This capability ensures authorized users experience little more than a slight account provisioning delay the first time they access the HPC system.
 
 We define a basic set of account states like "good\_standing", "certification\_required", and "account\_hold" to facilitate operations.
@@ -287,11 +288,11 @@ In the arrangement of Software Defined HPC (SDHPC) shown, user routes are establ
 ```
 
 Our SDHPC framework was developed in response to a confluence of events.
-In addition to vendor, product license, and product lifecycle challenges, we faced power constraints, increasing storage demand, and the limits of annual budget allocations.
+In addition to vendor, product license, and product lifecycle changes, we faced power constraints, increasing storage demand, and the limits of annual budget allocations.
 
 The GPFS parallel storage for our HPC system required a version upgrade to ensure support continuity.
 Changes in the vendor landscape required moving petabytes of data to a new GPFS implementation from a new vendor @Sedlmayer2020.
-Product license changes led us to develop a cost-effective storage system that transparently moves inactive files from the GPFS performance tier to a capacity tier implemented with CephFS @carlz-at-us.ibm.com2020.
+Product license changes led us to deploy a cost-effective storage system that transparently moves inactive files from the GPFS performance tier to a capacity tier implemented with CephFS @carlz-at-us.ibm.com2020.
 Our implementation presents users with a unified file namespace for HPC applications, maximizing performance for active analyses with GPFS, and capacity for file retention with CephFS.
 
 Power constraints within the on-campus data center drove decisions to consolidate all RCS compute services in newly-available, high-power racks at a nearby commercial data center @DcbloxHDcolo.
@@ -345,8 +346,8 @@ Deployment of testable integration environments takes only a few minutes, reduci
 
 We considered the potential for performance impacts of SDHPC through the introduction of cloud-native (VM-based) application routers.
 HTTP reverse-proxies are a standard part of the OOD deployment and common for at-scale cloud deployments.
-Instead, we chose to align the HTTP application router configuration with VM sizing recommendations provided in the OOD documentation.
 As such, SDHPC HTTP application router performance did not present any concerns and was not explicitly studied.
+Instead, we chose to align the HTTP application router configuration with VM sizing recommendations provided in the OOD documentation.
 In order to understand impacts on SSH performance, however, we measured data transfer throughput for a variety of SSH connection scenarios with and without the use of the sshpiper application router.
 
 :::{table} SSH Throughput Tests. Timed SCP transfers of a 2 Gigabyte file (base-ten) to destination hosts, averaged over thirty tests.
