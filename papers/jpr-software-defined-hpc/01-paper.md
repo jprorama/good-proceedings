@@ -83,10 +83,10 @@ The development of immersive web interfaces to HPC systems provided a friendlier
 Among these interfaces, Open OnDemand (OOD) has emerged as the most successful @Hudak2018.
 Now a fundamental component of many HPC systems, OOD has aligned user expectations with the self-directed experience of cloud-native applications.
 
-OOD owes its success to a reduction of cognitive load for researchers.
+OOD owes its success to reduced cognitive load for researchers.
 The reference deployment of OOD provides access to several interactive, web-native applications.
 Jupyter Notebooks, R Studio, and a virtual desktop capable of presenting native, windowed applications, are all available behind a simple resource request form.
-Researchers start by engaging with their HPC system via the browser using familiar web applications and, when they are ready, can migrate to batch tools at the command-line.
+Researchers start by engaging with their HPC system via the browser using familiar web applications and, when they are ready, they can migrate to batch tools at the command-line.
 Implementation details, such as submitting a job script to the scheduler, are hidden behind the software-defined abstractions of the resource request form and application definition.
 Because OOD hides these details, researchers can more readily incorporate HPC into their research workflows.
 
@@ -94,7 +94,7 @@ OOD operates by mapping browser interactions to per-user web servers.
 When a user connects to the HPC system via HTTP, the OOD server spawns a web server process running under their account identity, as defined on the HPC system.
 Whenever the user executes actions on the web site, processes started by the web server run within their identity context.
 The net effect is that user engagement with the HPC system is shepherded by software definitions—identity, operating system rules, OOD application definitions, and the scheduler.
-User interaction via OOD is governed by the same permissions enforced by the operating system on all the user's processes, whether started trough OOD or traditional command-line accessed via SSH.
+User interaction with the system through OOD is governed by the same operating system-enforced permissions on all the user's processes, in the same way as if started at a traditional command-line through SSH.
 
 OOD transforms HPC user engagement into a web-native experience.
 SDHPC transforms the HPC system itself into a cloud-native application.
@@ -138,7 +138,7 @@ The "data center as a computer" model facilitates systems development, abstracti
 <!-- this section should likely give way to the later RCS interpretation. 
 we should focus on the contribution of warehouse scale computing here -->
 Compute resources, both HPC and cloud, form the central processing unit (CPU).
-Compute-adjacent storage, such parallel network file storage, cache data for performance.
+Compute-adjacent storage, such as parallel network file storage, cache data for performance.
 Multi-modal storage, like block and object, persist data, and the internal networks are mainboard chips, traces, and cables.
 <!--- end save for later -->
 These abstractions guide organization of multi-site and multi-system infrastructure deployments.
@@ -165,7 +165,7 @@ RCS delivers compute, storage, and networking services to research applications.
 
 ```{figure} images/RCS Architecture.png
 :label: rcs_architecture
-:alt: Network graph diagram of RCS architecture made of a collection of boxes, each containing text, connected by lines.
+:alt: Network graph diagram of RCS architecture made of a collection of boxes connected by lines. Each box contains text.
 
 RCS architecture follows warehouse-scale computer design. Batch HPC, virtual machine (VM), and container compute modalities (top) are all connected to an L3 Ethernet interconnect with a low-latency InfiniBand fabric added for HPC workloads (center). The interconnect links provide access to a parallel file systems (FS) and to multi-modal storage with FS, block, and object modalities (bottom). The interconnect also provides peering to external networks (bottom).
 ```
@@ -224,7 +224,7 @@ In practice, SSH connection routing is less common, and routing SSH connections 
 User identity is not confirmed until the SSH connection is terminated and the session authenticated.
 Once the SSH session is active, it ordinarily results in the creation of a login shell on the host which serves as the connection endpoint, implicitly preventing further routing.
 To accomplish rule-based SSH routing based on user identity, we implemented an SSH application router using sshpiper, a reverse proxy for SSH built on Golang's SSH library @Lian2025.
-We contributed an enhancement to sshpiper which allows a user's group membership to be considered in its routing rules.
+We contributed an enhancement to sshpiper which allows a user's group membership to be considered in routing rules.
 
 The SSH application router enables routing to preferred login nodes based on site policy or other operational requirements.
 With sshpiper, routing works by daisy-chaining two SSH connections.
@@ -310,10 +310,9 @@ Implementing the migration required complete reconstruction of our HPC infrastru
 To avoid extended downtime for our entire user community, we planned the data migration around moving isolated subsets of users in batches across the storage systems.
 We planned the compute migration by staging an initial footprint of HPC compute capacity as a separate cluster attached to the new GPFS platform in the new facility.
 
-We designate Cluster A in #fig:ab_cluster as the HPC resources associate with the original storage platform and Cluster B the resources associated with the new storage platform.
+We designate Cluster A in #fig:ab_cluster as the HPC resources associated with the original storage platform and Cluster B with the new storage platform.
 This provides distinct environments onto which users can be mapped depending on their data migration status, reflected by membership in group A or group B.
-This split cluster approach allows moving users and HPC capacity as batches of data are migrated.
-This incremental migration provides a natural load-testing ramp for the new storage solution.
+A split cluster approach allows incremental migration of users and HPC capacity as batches of data are migrated, providing a natural load-testing ramp for the new storage solution.
 
 The SDHPC HTTP and SSH application routers provide stable endpoints for all users, regardless of their migration status.
 Moving a user is accomplished by changing the group membership of their account from group A to group B.
