@@ -134,15 +134,11 @@ We maintain a site-specific fork serving as our foundation for software defined 
 The fork has been extended with Ansible-deployed OOD web services @Tripathi2020.
 We further extend this Ansible code-base to support SDHPC in this work.
 
-The "data center as a computer" model facilitates systems development, abstracting complex subsystems as the components in a personal computer @Barroso2019.
-<!-- this section should likely give way to the later RCS interpretation. 
-we should focus on the contribution of warehouse scale computing here -->
-Compute resources, both HPC and cloud, form the central processing unit (CPU).
-Compute-adjacent storage, such as parallel network file storage, cache data for performance.
-Multi-modal storage, like block and object, persist data, and the internal networks are mainboard chips, traces, and cables.
-<!--- end save for later -->
+The "data center as a computer" model facilitates systems development and operation, abstracting complex multi-cluster platforms as a warehouse-scale computer (WSC) @Barroso2019.
+WSCs enjoy economies of scale by combining fleets of systems into homogeneous platforms running a common set of provider workloads.
+WSCs abstract the compute, storage, and networking resources delivered to applications.
 These abstractions guide organization of multi-site and multi-system infrastructure deployments.
-Additionally, the model is easy to reason about, improving stakeholder communication and strategizing.
+The WSC model eases reasoning about system design and expansion.
 
 (sdhpc)=
 # Software Defined HPC
@@ -179,7 +175,7 @@ The "data center as a computer" model allows conceptualizing these RCS services 
 The various compute services represent the CPU, the interconnects represent the component connectivity of the mainboard, the storage services map to a variety of performance caches and persistent storage devices, and the edge networks represent the computer's network interfaces.
 While not a literal mapping for application design, the model simplifies comprehension of the complex clusters that implement each of these services.
 This model also simplifies reasoning about the function of RCS services and their architectural arrangement.
-The RCS helps focus stakeholder communication and strategizing service improvement.
+The RCS helps focus stakeholder communication and simplifies strategizing service improvement.
 
 HPC batch computing is implemented via a traditional, physical cluster of compute nodes.
 At our site, the HPC cluster is deployed using Base Command Manager (BCM), formerly Bright Cluster Manager.
